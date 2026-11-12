@@ -1,7 +1,25 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/montserrat";
+
+/* Apple Garamond: reference download in docs/fonts; web-use licence still to be confirmed. */
+@font-face {
+  font-family: "Apple Garamond";
+  src: url("../assets/fonts/AppleGaramond-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Apple Garamond";
+  src: url("../assets/fonts/AppleGaramond-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
 
 @theme {
-  --color-brand-green: #00b68c;
+  --color-brand-green: #00C090;
   --color-brand-cream: #d8d9c2;
   --color-brand-red: #b0242d;
   --color-brand-red-hover: #941e26;
@@ -10,7 +28,32 @@
   --color-ink: #171717;
   --color-muted: #525252;
   --color-line: #d4d4d4;
-  --font-brand: "BUDGET", Arial, sans-serif;
+
+  /* Homepage palette from the Figma design (additive; brand tokens above are unchanged). */
+  --color-forest: #193e34;
+  --color-paper: #f8f5ef;
+  --color-paper-soft: #fffcf7;
+  --color-rose: #b35258;
+  --color-rose-hover: #9d444a;
+  --color-rose-active: #85383d;
+  --color-mint: #ddeee6;
+  --color-mint-soft: #b6e7d6;
+  --color-sage: #cbe3d8;
+  --color-sun: #ffc400;
+  --color-citron: #eff87d;
+  --color-bubble: #efe9d5;
+  --color-bubble-dot: #fbc337;
+  --color-iris: #8470f8;
+  --color-teal-deep: #087967;
+  --color-teal-active: #00ac84;
+  --color-nav-ink: #16382f;
+  --color-nav-line: #d7dfd8;
+
+  /* "Budget 2012" has no font file yet (docs/fonts/budget-2012-candidate is empty), so Inter stands in. */
+  --font-brand: "Budget 2012", "Inter Variable", Arial, sans-serif;
+  --font-ui: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-sub: "Montserrat Variable", Montserrat, system-ui, sans-serif;
+  --font-display: "Apple Garamond", Garamond, Georgia, serif;
   --font-editorial: "Apple Garamond", Garamond, Georgia, serif;
 }
 
@@ -18,7 +61,7 @@
   body {
     margin: 0;
     min-width: 320px;
-    font-family: var(--font-brand);
+    font-family: var(--font-ui);
     color: var(--color-ink);
     background: #fff;
     font-size: 1rem;
@@ -37,6 +80,7 @@
 }
 
 @layer components {
+  html { scroll-behavior: smooth; }
   .page-container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 16px; }
   .page-section { padding-block: 48px; }
   .page-title { font-size: 36px; font-weight: 700; line-height: 1.1; }
@@ -45,9 +89,9 @@
   .body-copy { max-width: 65ch; color: var(--color-muted); }
   .text-link { color: var(--color-brand-blue); text-decoration: underline; text-underline-offset: 4px; }
 
-  /* The source PNG has generous transparent margins; only the empty area is clipped. */
-  .brand-logo { position: relative; display: block; width: 180px; height: 64px; overflow: hidden; flex-shrink: 0; }
-  .brand-logo img { position: absolute; width: 200px; max-width: none; height: auto; left: -13px; top: -95px; }
+  /* The logo PNG is pre-cropped to its content with a transparent background. */
+  .brand-logo { display: block; width: 124px; flex-shrink: 0; }
+  .brand-logo img { display: block; width: 100%; height: auto; }
 
   @media (min-width: 768px) {
     .page-container { padding-inline: 24px; }
