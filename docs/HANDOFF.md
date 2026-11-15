@@ -65,7 +65,7 @@ Layout: **mobile first** (kelas tanpa prefix = mobile 390px; `md:` ke atas untuk
 
 ## 4. Pola kerja yang sudah terbukti
 
-**Sumber desain.** MCP Figma plan Starter sering "Out of calls" dan browser pane terlalu sempit untuk membaca Figma. Cara yang berhasil: **pemilik mengekspor frame sebagai PDF vektor** (zip di `C:\Users\ASUS\Downloads\`). Satu PDF bisa berisi beberapa frame berdampingan.
+**Sumber desain.** MCP Figma plan Starter sering "Out of calls" dan browser pane terlalu sempit untuk membaca Figma. Cara yang berhasil: **pemilik mengekspor frame sebagai file PDF vektor** (di `C:\Users\ASUS\Downloads\`; kadang dibungkus zip, ekstrak dulu ke folder sementara). Satu PDF bisa berisi beberapa frame berdampingan.
 1. Ekstrak dengan `docs/qa/pdf_extract.py`: teks per baris (posisi y, x, ukuran font, isi), gambar (termasuk alpha/smask), dan render PNG per frame. Nama font dan warna teks sudah di-outline di PDF, jadi cocokkan secara visual.
 2. Ambil warna & gradasi dengan sampling piksel dari render 1x (mis. kolom x=3 untuk latar halaman).
 3. Foto/ilustrasi yang bisa diekstrak: kompres ke webp, simpan di `src/assets/<area>/`, daftarkan di `index.ts`. Yang gagal diekstrak ("bad xref"): pakai foto yang sudah ada + tint, dan catat sebagai placeholder.
