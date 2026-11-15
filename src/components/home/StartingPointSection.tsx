@@ -5,7 +5,7 @@ import { buttonStyles } from "../UI/button-styles";
 
 export default function StartingPointSection() {
   return (
-    <section id="starting-point" aria-labelledby="starting-point-title" className="scroll-mt-24 bg-paper pt-[118px] md:pt-28">
+    <section id="starting-point" aria-labelledby="starting-point-title" className="scroll-mt-24 pt-[118px] md:pt-28">
       <img src={divider} alt="" aria-hidden="true" className="mx-auto block h-[3px] w-full max-w-[316px] px-0 md:max-w-xl" />
       <h2 id="starting-point-title" className="mx-auto mt-[70px] max-w-[362px] px-3 text-center font-display text-[22px] font-bold leading-[1.15] text-black md:max-w-none md:text-4xl">
         {startingPoint.title}

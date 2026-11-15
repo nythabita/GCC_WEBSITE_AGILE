@@ -94,7 +94,7 @@ export const programs: Program[] = [
 export const startingPoint = {
   title: "Find Your Starting Point in Consulting",
   description:
-    "Want to learn the fundamentals of consulting, understand team development, or explore business challenges? Choose your area of interest to find the information most relevant to you.",
+    "Ingin mempelajari dasar-dasar konsultasi, memahami pengembangan tim, atau mengeksplorasi tantangan bisnis? Pilih bidang minat Anda untuk menemukan informasi yang paling relevan bagi Anda.",
   cta: { label: "Explore Your Learning Needs", href: "/assessment" },
 };
 
@@ -132,7 +132,7 @@ export const winners = {
   ],
 };
 
-export type Mentor = { name: string; highlights: string[] };
+export type Mentor = { name: string; portrait: "male" | "female"; highlights: string[] };
 
 export const mentors = {
   title: "Meet the Mentors Behind Our Learning",
@@ -140,18 +140,22 @@ export const mentors = {
   items: [
     {
       name: "Arvian Andhika",
+      portrait: "male",
       highlights: ["Strategy Consultant at PwC Indonesia", "Winner of 5+ National Business Case Competitions", "Ex-Strategic Planning at Pelindo"],
     },
     {
       name: "Nadira Prameswari",
+      portrait: "female",
       highlights: ["Marketing Consultant at Grab Indonesia", "Ex-Corporate Strategy at Trimegah Sekuritas"],
     },
     {
       name: "Raka Mahendra",
+      portrait: "male",
       highlights: ["Ex-Management Consultant at Kearney", "Ex-Corporate Strategy at Astra International", "Winner of 7+ Case Competitions"],
     },
     {
       name: "Citra Adeline",
+      portrait: "female",
       highlights: ["Product Strategy at Shopee Indonesia", "5+ Years in Digital Product & Growth", "Mentor for 10+ Student Case Competitions"],
     },
   ] satisfies Mentor[],

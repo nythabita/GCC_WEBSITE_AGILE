@@ -3,15 +3,15 @@ import { Link } from "react-router";
 
 // "GCC_Pilih_Program_Mobile" (WORKING FILE → 0. LOGIN TO HOMEPAGE). This frame uses its own
 // palette (navy on white, Arial) rather than the forest/paper system of the other pages.
-const navy = "text-[#102f4c]";
-const muted = "text-[#4b6072]";
+const navy = "text-navy";
+const muted = "text-slate";
 
 const choices = [
   {
     audience: "Untuk mahasiswa",
-    audienceColor: "text-[#b02020]",
-    icon: <BookOpen size={24} aria-hidden="true" className="text-[#b02020]" />,
-    surface: "bg-[#faf5ee]",
+    audienceColor: "text-crimson",
+    icon: <BookOpen size={24} aria-hidden="true" className="text-crimson" />,
+    surface: "bg-cream-soft",
     statement: "Saya ingin belajar",
     program: "GrowthCamp",
     tagline: "Build Your Consulting Foundation",
@@ -22,9 +22,9 @@ const choices = [
   },
   {
     audience: "Untuk mentee GCC",
-    audienceColor: "text-[#4070d0]",
-    icon: <Target size={24} aria-hidden="true" className="text-[#4070d0]" />,
-    surface: "bg-[#eef3fb]",
+    audienceColor: "text-azure",
+    icon: <Target size={24} aria-hidden="true" className="text-azure" />,
+    surface: "bg-sky-soft",
     statement: "Saya siap berkontribusi dalam proyek",
     program: "GrowthX",
     tagline: "Put Your Skills into Practice",
@@ -35,9 +35,9 @@ const choices = [
   },
   {
     audience: "Untuk pemilik UMKM",
-    audienceColor: "text-[#1f8a5b]",
-    icon: <MessageSquare size={24} aria-hidden="true" className="text-[#1f8a5b]" />,
-    surface: "bg-[#e8f5ef]",
+    audienceColor: "text-leaf",
+    icon: <MessageSquare size={24} aria-hidden="true" className="text-leaf" />,
+    surface: "bg-leaf-soft",
     statement: "Saya memiliki tantangan bisnis",
     program: "GrowthConnect",
     tagline: "Bring Your Business Challenge",
@@ -49,18 +49,18 @@ const choices = [
 ];
 
 const guidance = [
-  { surface: "bg-[#faf5ee]", title: "Kenali proses belajar", description: "Jelajahi fondasi keterampilan dan gambaran GrowthCamp.", cta: { label: "Jelajahi Learn", to: "/learn" } },
-  { surface: "bg-[#e8f5ef]", title: "Kenali penerapan", description: "Pahami jalur mahasiswa dan pengajuan tantangan bisnis UMKM.", cta: { label: "Jelajahi Apply", to: "/apply" } },
+  { surface: "bg-cream-soft", title: "Kenali proses belajar", description: "Jelajahi fondasi keterampilan dan gambaran GrowthCamp.", cta: { label: "Jelajahi Learn", to: "/learn" } },
+  { surface: "bg-leaf-soft", title: "Kenali penerapan", description: "Pahami jalur mahasiswa dan pengajuan tantangan bisnis UMKM.", cta: { label: "Jelajahi Apply", to: "/apply" } },
 ];
 
-const primaryButton = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#b02020] text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[#941b1b]";
-const outlineButton = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl border border-[#4070d0] bg-white text-[15px] font-bold text-[#102f4c] transition-colors duration-150 hover:bg-[#eef3fb]";
+const primaryButton = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-crimson text-[15px] font-bold text-white transition-colors duration-150 hover:bg-crimson-hover";
+const outlineButton = "flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl border border-azure bg-white text-[15px] font-bold text-navy transition-colors duration-150 hover:bg-sky-soft";
 
 export default function PilihProgramPage() {
   return (
-    <main className="bg-white font-[Arial,sans-serif]">
+    <main className="bg-white font-plain">
       <div className="mx-auto w-full max-w-7xl px-6 pb-14 pt-4 md:px-8 md:pb-24 md:pt-8">
-        <Link to="/" className="inline-flex min-h-11 items-center gap-1 text-base font-bold text-[#4070d0]">
+        <Link to="/" className="inline-flex min-h-11 items-center gap-1 text-base font-bold text-azure">
           <ChevronLeft size={18} aria-hidden="true" />
           Kembali ke Discover
         </Link>
@@ -80,10 +80,10 @@ export default function PilihProgramPage() {
                 <p className={`text-[11px] font-bold uppercase tracking-wide ${choice.audienceColor}`}>{choice.audience}</p>
               </div>
               <h2 className={`mt-7 text-[23px] font-bold leading-[1.2] ${navy}`}>{choice.statement}</h2>
-              <p className="mt-5 text-[25px] font-bold leading-none text-[#b02020]">{choice.program}</p>
+              <p className="mt-5 text-[25px] font-bold leading-none text-crimson">{choice.program}</p>
               <p className={`mt-3 text-base font-bold ${navy}`}>{choice.tagline}</p>
               <p className={`mt-4 text-base leading-snug ${muted}`}>{choice.description}</p>
-              <hr className="my-6 border-[#d9e0e8]" />
+              <hr className="my-6 border-rule" />
               <h3 className={`text-sm font-bold ${navy}`}>Yang akan digali</h3>
               <p className={`mt-2 text-[15px] leading-snug ${muted}`}>{choice.explored}</p>
               <Link to={choice.cta.to} className={`${primaryButton} mt-6`}>

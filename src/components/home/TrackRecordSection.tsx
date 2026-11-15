@@ -2,9 +2,9 @@ import { trackRecord } from "../../data/homepage-content";
 
 export default function TrackRecordSection() {
   return (
-    <section aria-labelledby="track-record-title" className="bg-paper pt-[101px] md:pt-28">
+    <section aria-labelledby="track-record-title" className="pt-[101px] md:pt-28">
       <div className="mx-auto w-full max-w-7xl px-6 md:px-8">
-        <h2 id="track-record-title" className="text-center font-display text-[40px] font-bold italic leading-[1.1] text-black md:text-6xl">
+        <h2 id="track-record-title" className="text-center font-display text-[40px] font-bold italic leading-[1.1] text-white md:text-6xl">
           {trackRecord.title}
         </h2>
         <ul className="mx-auto mt-[42px] grid max-w-[374px] grid-cols-2 gap-x-[23px] gap-y-[19px] md:mt-14 md:max-w-5xl md:grid-cols-4 md:gap-6">

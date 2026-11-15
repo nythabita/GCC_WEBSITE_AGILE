@@ -16,7 +16,7 @@ export default function ProgramCard({ program, variant = "home" }: Props) {
 
   return (
     <article aria-labelledby={titleId} className="mx-auto w-full max-w-[326px] md:max-w-none">
-      <div className={`relative mx-auto min-h-[419px] w-full overflow-hidden rounded-[15px] bg-forest px-4 pb-14 pt-4 text-white md:max-w-none ${explore ? "max-w-[342px]" : "max-w-[296px]"}`}>
+      <div className={`relative mx-auto min-h-[419px] w-full overflow-hidden rounded-[15px] bg-brand-green px-4 pb-14 pt-4 text-white md:max-w-none ${explore ? "max-w-[342px]" : "max-w-[296px]"}`}>
         <img src={programCardBackground} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-5" />
         <div className="relative">
           <div className="flex items-start justify-between gap-2">
@@ -24,7 +24,7 @@ export default function ProgramCard({ program, variant = "home" }: Props) {
             <img src={program.logo.src} alt={program.logo.alt} width={program.logo.width} style={{ width: program.logo.width }} className="-mt-1 h-auto max-w-[45%] shrink-0" />
           </div>
           {explore ? (
-            <p className="mt-4 inline-flex min-h-[38px] w-[240px] items-center justify-center rounded-[10px] bg-[#f3e2b8] font-ui text-base font-semibold leading-none text-forest">
+            <p className="mt-4 inline-flex min-h-[38px] w-[240px] items-center justify-center rounded-[10px] bg-sun-soft font-ui text-base font-semibold leading-none text-forest">
               {program.exploreBadge}
             </p>
           ) : (

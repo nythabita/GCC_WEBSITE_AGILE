@@ -32,7 +32,7 @@ function HeroCollage() {
       {captionPins.map((pin, index) => (
         <p
           key={heroCaptions[index]}
-          className="whitespace-nowrap bg-linear-to-r from-[#dcff12] to-[#ffe799] to-[52.885%] bg-clip-text text-center font-display font-bold leading-none text-transparent"
+          className="whitespace-nowrap text-glow text-center font-display font-bold leading-none"
           style={{ ...pinStyle(pin, BOX), fontSize: cqw(14, BOX.w) }}
         >
           {heroCaptions[index]}
@@ -47,13 +47,13 @@ export default function HeroSection({ content }: { content: HomepageContent["her
   const lines = content.title.split(/(?<=[.!?])\s+/);
 
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden bg-forest text-paper">
+    <section aria-labelledby="hero-title" className="relative overflow-hidden bg-brand-green text-paper">
       <img src={heroCircles} alt="" aria-hidden="true" className="pointer-events-none absolute right-0 top-0 w-[390px] max-w-none select-none md:w-[560px]" />
       <div className="relative mx-auto grid w-full max-w-7xl gap-8 px-6 pb-4 pt-4 md:grid-cols-2 md:items-center md:gap-12 md:px-8 md:py-20">
         <div>
           <h1 id="hero-title" className="font-display text-[32px] font-bold leading-[1.06] md:text-[56px]">
             {lines.map((line, index) => (
-              <span key={line} className={`block ${index === lines.length - 1 ? "text-mint-soft" : ""}`}>{line}</span>
+              <span key={line} className={`block ${index === lines.length - 1 ? "text-neon" : ""}`}>{line}</span>
             ))}
           </h1>
           <p className="mt-4 max-w-[345px] text-sm leading-[1.35] md:max-w-xl md:text-lg">{content.description}</p>

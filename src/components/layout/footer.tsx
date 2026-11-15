@@ -10,7 +10,7 @@ const contact = {
 
 export default function Footer() {
   return (
-    <footer className="border-t-[3px] border-teal-deep bg-forest text-white">
+    <footer className="border-t-[3px] border-teal-deep bg-brand-green text-white">
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-6 pb-8 pt-6 md:grid-cols-[1.4fr_1fr_1.2fr] md:gap-12 md:px-8 md:pt-12">
         <div>
           <Link to="/" aria-label="Growth Consulting — Beranda" className="inline-block">

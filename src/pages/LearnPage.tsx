@@ -45,7 +45,7 @@ export default function LearnPage() {
         </section>
       </PageContainer>
 
-      <section aria-labelledby="featured-title" className="mt-12 bg-[#f3eee4] py-6 md:mt-24 md:py-16">
+      <section aria-labelledby="featured-title" className="mt-12 bg-paper-warm py-6 md:mt-24 md:py-16">
         <PageContainer>
           <Eyebrow>{featuredGrowthCamp.eyebrow}</Eyebrow>
           <div className="mt-4 flex items-start justify-between gap-4">

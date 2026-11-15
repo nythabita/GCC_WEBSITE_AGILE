@@ -2,7 +2,7 @@ import { community } from "../../data/homepage-content";
 
 export default function CommunitySection() {
   return (
-    <section aria-labelledby="community-title" className="bg-paper pt-[131px] md:pt-28">
+    <section aria-labelledby="community-title" className="bg-mint-mid pb-8">
       <div className="bg-citron px-6 pb-12 pt-[35px] md:py-16">
         <p className="text-center font-display text-xl font-bold italic text-black md:text-3xl">{community.eyebrow}</p>
         <h2 id="community-title" className="text-center font-brand text-[40px] leading-none text-iris md:text-6xl">{community.title}</h2>

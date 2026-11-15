@@ -15,7 +15,7 @@ export default function AboutPage() {
         <BackLink to="/">Kembali ke Beranda</BackLink>
 
         <div className="md:grid md:grid-cols-2 md:gap-8">
-          <section aria-labelledby="about-title" className="relative mt-3 overflow-hidden rounded-2xl bg-forest p-5 text-paper md:p-8">
+          <section aria-labelledby="about-title" className="relative mt-3 overflow-hidden rounded-2xl bg-brand-green p-5 text-paper md:p-8">
             <span aria-hidden="true" className="absolute -right-10 -top-12 size-[150px] rounded-full bg-white/10" />
             <span className="inline-block rounded-full bg-mint px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-forest">Tentang GCC</span>
             <DisplayTitle as="h1" className="mt-6 text-paper md:text-5xl">

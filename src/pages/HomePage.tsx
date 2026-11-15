@@ -19,12 +19,15 @@ export default function HomePage({ content }: { content: HomepageContent }) {
       )}
       <HeroSection content={content.hero} />
       <AboutSection content={content.about} />
-      <ProgramsSection content={content.journey} />
-      <StartingPointSection />
-      <TrackRecordSection />
-      <WinnersSection />
-      <MentorsSection />
-      <CollaborationsSection />
+      {/* Cream fades into the brand green from the program cards down to the Community band. */}
+      <div className="bg-[linear-gradient(to_bottom,var(--color-paper)_15%,var(--color-brand-green)_99%)] pb-[131px] md:pb-28">
+        <ProgramsSection content={content.journey} />
+        <StartingPointSection />
+        <TrackRecordSection />
+        <WinnersSection />
+        <MentorsSection />
+        <CollaborationsSection />
+      </div>
       <CommunitySection />
     </main>
   );

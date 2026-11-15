@@ -37,7 +37,7 @@ export function isPathActive(pathname: string, path: string) {
   return path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(`${path}/`);
 }
 
-// Label shown beside the menu button on mobile. Unknown paths render the homepage, so they read as Discover.
+// Label shown beside the menu button on mobile. Unknown paths render the homepage, so they read as Home (the label in the latest Figma navbar).
 export function getSectionLabel(pathname: string) {
-  return sectionLabels.find((item) => item.path !== "/" && isPathActive(pathname, item.path))?.label ?? "Discover";
+  return sectionLabels.find((item) => item.path !== "/" && isPathActive(pathname, item.path))?.label ?? "Home";
 }

@@ -136,7 +136,7 @@ Gunakan Tailwind v4 yang sudah terpasang. Pusatkan token di `src/styles/global.c
 @import "tailwindcss";
 
 @theme {
-  --color-brand-green: #00b68c;
+  --color-brand-green: #00c090;
   --color-brand-cream: #d8d9c2;
   --color-brand-red: #b0242d;
   --color-brand-blue: #3e6cc6;

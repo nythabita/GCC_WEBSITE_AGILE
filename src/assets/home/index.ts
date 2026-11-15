@@ -24,3 +24,4 @@ export { default as collabLearnitTab } from "./collab-learnit-tab.png";
 export { default as collabTutorlogy } from "./collab-tutorlogy.png";
 export { default as collabHingeMeal } from "./collab-hinge-meal.png";
 export { default as collabHiPud } from "./collab-hi-pud.png";
+export { default as mentorSilhouetteFemale } from "./mentor-silhouette-female.webp";

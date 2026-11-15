@@ -49,7 +49,7 @@ export function ActionRow({ to, children, tone = "rose" }: { to: string; childre
 
 export function PhotoFrame({ src, alt, caption, className = "" }: { src?: string; alt: string; caption: string; className?: string }) {
   return (
-    <figure className={`overflow-hidden rounded-2xl bg-forest ${className}`}>
+    <figure className={`overflow-hidden rounded-2xl bg-brand-green ${className}`}>
       <div className="aspect-[342/178] w-full bg-sage">
         {src ? (
           <img src={src} alt={alt} className="block h-full w-full object-cover" />

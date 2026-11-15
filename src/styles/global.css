@@ -2,19 +2,28 @@
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/montserrat";
 
-/* Apple Garamond: reference download in docs/fonts; web-use licence still to be confirmed. */
+/* EB Garamond (SIL OFL, see assets/fonts/EBGaramond-OFL.txt) stands in for the design's Apple Garamond,
+   whose web licence was never confirmed. Latin subset, bold weights only (the design only uses bold). */
 @font-face {
-  font-family: "Apple Garamond";
-  src: url("../assets/fonts/AppleGaramond-Bold.ttf") format("truetype");
+  font-family: "EB Garamond";
+  src: url("../assets/fonts/EBGaramond-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Apple Garamond";
-  src: url("../assets/fonts/AppleGaramond-BoldItalic.ttf") format("truetype");
+  font-family: "EB Garamond";
+  src: url("../assets/fonts/EBGaramond-BoldItalic.woff2") format("woff2");
   font-weight: 700;
   font-style: italic;
+  font-display: swap;
+}
+/* Budget 2012 (listed as freeware on FontSpace; confirm the licence allows commercial web use). */
+@font-face {
+  font-family: "Budget 2012";
+  src: url("../assets/fonts/Budget2012.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -48,13 +57,32 @@
   --color-teal-active: #00ac84;
   --color-nav-ink: #16382f;
   --color-nav-line: #d7dfd8;
+  --color-paper-warm: #f3eee4;
+  --color-sun-soft: #f3e2b8;
+  --color-glow-start: #dcff12;
+  --color-glow-end: #ffe799;
+  --color-neon: #00ffa6;
+  --color-mist: #e4ebe8;
+  --color-mint-mid: #8bddc5;
 
-  /* "Budget 2012" has no font file yet (docs/fonts/budget-2012-candidate is empty), so Inter stands in. */
+  /* "Pilih Program" frame: its own navy palette. Red and blue match Growth Red / Growth Blue in the Figma brand guide. */
+  --color-navy: #102f4c;
+  --color-slate: #4b6072;
+  --color-crimson: #b02020;
+  --color-crimson-hover: #941b1b;
+  --color-azure: #4070d0;
+  --color-leaf: #1f8a5b;
+  --color-cream-soft: #faf5ee;
+  --color-sky-soft: #eef3fb;
+  --color-leaf-soft: #e8f5ef;
+  --color-rule: #d9e0e8;
+
   --font-brand: "Budget 2012", "Inter Variable", Arial, sans-serif;
   --font-ui: "Inter Variable", Inter, system-ui, sans-serif;
   --font-sub: "Montserrat Variable", Montserrat, system-ui, sans-serif;
-  --font-display: "Apple Garamond", Garamond, Georgia, serif;
-  --font-editorial: "Apple Garamond", Garamond, Georgia, serif;
+  --font-display: "EB Garamond", "Apple Garamond", Garamond, Georgia, serif;
+  --font-plain: Arial, Helvetica, sans-serif;
+  --font-editorial: "EB Garamond", "Apple Garamond", Garamond, Georgia, serif;
 }
 
 @layer base {
@@ -80,6 +108,13 @@
 }
 
 @layer components {
+  /* Yellow-to-lime gradient used for the polaroid and winner captions. */
+  .text-glow {
+    background-image: linear-gradient(to right, var(--color-glow-start), var(--color-glow-end) 52.885%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   html { scroll-behavior: smooth; }
   .page-container { width: 100%; max-width: 1280px; margin-inline: auto; padding-inline: 16px; }
   .page-section { padding-block: 48px; }
