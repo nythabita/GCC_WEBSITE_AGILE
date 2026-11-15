@@ -48,16 +48,16 @@ export default function LearnPage() {
       <section aria-labelledby="featured-title" className="mt-12 bg-paper-warm py-6 md:mt-24 md:py-16">
         <PageContainer>
           <Eyebrow>{featuredGrowthCamp.eyebrow}</Eyebrow>
-          <div className="mt-4 flex items-start justify-between gap-4">
-            <div>
+          <div className="mt-4 flex items-start justify-between gap-3">
+            <div className="min-w-0">
               <h2 id="featured-title" className="font-brand text-[32px] leading-none">{featuredGrowthCamp.name}</h2>
               <p className="mt-4 font-sub text-xl font-semibold leading-tight md:text-2xl">
                 {featuredGrowthCamp.tagline.map((line) => <span key={line} className="block">{line}</span>)}
               </p>
             </div>
             {/* The source PNG has wide empty margins; crop them with an overflow box instead of scaling the layout. */}
-            <div className="mt-2 h-[90px] w-[110px] shrink-0 overflow-hidden opacity-80" aria-hidden="true">
-              <img src={growthCamp} alt="" className="block w-[210px] max-w-none -translate-x-[50px] -translate-y-[90px]" />
+            <div className="mt-2 h-[60px] w-[90px] shrink-0 overflow-hidden opacity-80" aria-hidden="true">
+              <img src={growthCamp} alt="" className="block w-[131px] max-w-none -translate-x-[21px] -translate-y-[53px]" />
             </div>
           </div>
           <p className="mt-7 text-base leading-snug md:max-w-2xl md:text-lg">{featuredGrowthCamp.description}</p>

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router";
+import { Routes, Route, Navigate, useLocation } from "react-router";
 import Navbar from "./components/layout/navbar";
 import Footer from "./components/layout/footer";
 import PreviewPage from "./components/layout/PreviewPage";
@@ -7,10 +7,9 @@ import LearnPage from "./pages/LearnPage";
 import ApplyPage from "./pages/ApplyPage";
 import GrowPage from "./pages/GrowPage";
 import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
+import DiscoverPage from "./pages/DiscoverPage";
 import AssessmentPage from "./pages/AssessmentPage";
 import ProgramsPage from "./pages/ProgramsPage";
-import PilihProgramPage from "./pages/PilihProgramPage";
 import { homepageDraft } from "./data/homepage-draft";
 
 // Scroll to the hash target after client-side navigation (e.g. the drawer's "/#programs" link).
@@ -36,10 +35,11 @@ export default function App() {
         <Route path="/learn" element={<LearnPage />} />
         <Route path="/apply" element={<ApplyPage />} />
         <Route path="/grow" element={<GrowPage />} />
-        <Route path="/about" element={<AboutPage />} />
+        <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/about" element={<Navigate to="/discover" replace />} />
         <Route path="/assessment" element={<AssessmentPage />} />
         <Route path="/programs" element={<ProgramsPage />} />
-        <Route path="/pilih-program" element={<PilihProgramPage />} />
+        <Route path="/pilih-program" element={<Navigate to="/assessment" replace />} />
         <Route path="/learn/growthcamp" element={<PreviewPage title="GrowthCamp" description="Detail program GrowthCamp sedang disiapkan." />} />
         <Route path="/apply/growthx" element={<PreviewPage title="GrowthX" description="Detail program GrowthX sedang disiapkan." />} />
         <Route path="/apply/growthconnect" element={<PreviewPage title="GrowthConnect" description="Detail program GrowthConnect sedang disiapkan." />} />

@@ -1,4 +1,4 @@
-type ButtonVariant = "primary" | "secondary" | "ghost" | "rose" | "paper" | "white" | "outline";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "rose" | "paper" | "white" | "outline" | "berry" | "berry-soft" | "sun";
 type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 export type ButtonStyleOptions = {
@@ -19,6 +19,9 @@ const variants: Record<ButtonVariant, string> = {
   rose: `${uiFont} border-rose bg-rose text-white hover:border-rose-hover hover:bg-rose-hover active:border-rose-active active:bg-rose-active`,
   paper: `${uiFont} border-paper bg-paper text-forest hover:border-white hover:bg-white`,
   white: `${uiFont} border-white bg-white text-black hover:border-paper hover:bg-paper`,
+  berry: `${uiFont} border-berry bg-berry text-white hover:border-berry-hover hover:bg-berry-hover active:bg-berry-hover`,
+  "berry-soft": `${uiFont} border-mint-pale bg-mint-pale text-forest hover:border-sage hover:bg-sage`,
+  sun: `${uiFont} border-sun bg-sun text-black hover:brightness-95`,
   outline: `${uiFont} border-forest bg-transparent text-forest hover:bg-mint active:bg-mint/70`,
 };
 

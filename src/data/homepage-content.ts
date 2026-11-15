@@ -20,7 +20,7 @@ import { logoGrowthConnect } from "../assets/brand";
 // Figma links these to the Explore Page and the program chooser.
 export const heroActions = {
   primary: { label: "Explore Our Programs", href: "/programs" },
-  secondary: { label: "Find Your Starting Point", href: "/pilih-program" },
+  secondary: { label: "Find Your Starting Point", href: "/assessment" },
 };
 
 export const heroPhotos = [

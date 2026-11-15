@@ -1,49 +1,58 @@
-import { ArrowRight, Puzzle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router";
-import { ActionRow, BackLink, DisplayTitle, PageContainer, StepBadge } from "../components/content/blocks";
+import { puzzleRed } from "../assets/discover";
+import { heroPitchingDay } from "../assets/home";
+import { assessmentAllPrograms, assessmentHero, assessmentOptions } from "../data/discover-content";
 
-// "Assessment — Mobile" (WORKING FILE → 1. DISCOVER): pick the statement that fits, then jump to a program.
-const options = [
-  { number: "01", statement: "Saya ingin belajar", link: { label: "Jelajahi GrowthCamp", to: "/learn/growthcamp" }, tone: "paper" as const },
-  { number: "02", statement: "Saya siap berkontribusi dalam proyek", link: { label: "Jelajahi GrowthX", to: "/apply/growthx" }, tone: "sun" as const },
-  { number: "03", statement: "Saya memiliki tantangan bisnis", link: { label: "Jelajahi GrowthConnect", to: "/apply/growthconnect" }, tone: "paper" as const },
-];
+const optionTones = {
+  berry: { card: "bg-berry border-berry", badge: "bg-white text-black", title: "text-white", link: "text-white" },
+  white: { card: "bg-white border-black/10", badge: "bg-black text-white", title: "text-forest", link: "text-black" },
+  green: { card: "bg-brand-green border-brand-green", badge: "bg-white text-black", title: "text-white", link: "text-white" },
+};
 
+// "Assessment — Mobile" (1. DISCOVER): pick the statement that fits, then jump to a program.
 export default function AssessmentPage() {
   return (
-    <main className="bg-paper text-forest">
-      <PageContainer className="pb-10 pt-2 md:pb-24 md:pt-6">
-        <BackLink to="/">Kembali ke Beranda</BackLink>
-
-        <section aria-labelledby="assessment-title" className="relative mt-3 overflow-hidden rounded-2xl bg-mint p-5 md:p-8">
-          <span aria-hidden="true" className="absolute -right-8 -top-10 size-[120px] rounded-full bg-white/60" />
-          <Puzzle aria-hidden="true" size={56} className="absolute -right-1 top-1 rotate-12 text-brand-red" fill="currentColor" />
-          <span className="inline-block rounded-full bg-paper-soft px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-forest">Find Your Path</span>
-          <DisplayTitle as="h1" className="mt-6 md:text-5xl">
-            <span id="assessment-title" className="block">Find Your<br />Starting Point</span>
-          </DisplayTitle>
-          <p className="mt-4 text-base leading-snug text-forest/80 md:text-lg">Pilih pernyataan yang paling sesuai dengan tujuanmu saat ini.</p>
+    <main className="bg-paper bg-[linear-gradient(to_bottom,var(--color-paper)_55%,#a7e3d0)]">
+      <div className="mx-auto w-full max-w-7xl px-6 pb-12 pt-[70px] md:px-8 md:pb-24 md:pt-16">
+        <section aria-labelledby="assessment-title" className="relative overflow-hidden rounded-2xl bg-white/60 p-5 md:p-10">
+          <img src={heroPitchingDay} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-[0.16]" />
+          <span aria-hidden="true" className="absolute -right-8 -top-10 size-[120px] rounded-full bg-white/80" />
+          <img src={puzzleRed} alt="" aria-hidden="true" className="absolute right-1 top-1 w-[44px]" />
+          <div className="relative">
+            <span className="inline-block rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-forest">{assessmentHero.badge}</span>
+            <h1 id="assessment-title" className="mt-5 font-display text-[42px] font-bold italic leading-[1.1] text-black md:text-6xl">
+              {assessmentHero.title.map((line) => <span key={line} className="block">{line}</span>)}
+            </h1>
+            <p className="mt-4 max-w-xs text-[15px] font-semibold leading-snug text-black md:max-w-md md:text-lg">{assessmentHero.description}</p>
+          </div>
         </section>
 
-        <ol className="mt-6 flex flex-col gap-4 md:grid md:grid-cols-3">
-          {options.map((option) => (
-            <li key={option.number} className="flex flex-col rounded-2xl border border-line/60 bg-white p-4 shadow-[0_1px_3px_rgba(25,62,52,0.06)]">
-              <div className="flex items-start gap-4">
-                <StepBadge number={option.number} tone={option.tone} />
-                <h2 className="pt-2 font-sub text-[17px] font-semibold leading-snug">{option.statement}</h2>
-              </div>
-              <Link to={option.link.to} className="mt-auto flex min-h-11 items-center justify-between gap-4 pl-14 text-sm font-semibold text-teal-deep">
-                {option.link.label}
-                <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-            </li>
-          ))}
+        <ol className="mt-6 flex flex-col gap-4 md:grid md:grid-cols-3 md:items-stretch">
+          {assessmentOptions.map((option) => {
+            const tone = optionTones[option.tone];
+            return (
+              <li key={option.number} className={`flex flex-col rounded-2xl border p-3 ${tone.card}`}>
+                <div className="flex items-start gap-4">
+                  <span className={`flex h-[27px] w-11 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${tone.badge}`}>{option.number}</span>
+                  <h2 className={`font-display text-[26px] font-bold italic leading-[0.95] ${tone.title}`}>
+                    {option.question.map((line) => <span key={line} className="block">{line}</span>)}
+                  </h2>
+                </div>
+                <Link to={option.link.to} className={`mt-auto flex min-h-11 items-center justify-between gap-4 pl-[60px] pt-3 text-base font-bold ${tone.link}`}>
+                  {option.link.label}
+                  <ArrowRight size={18} aria-hidden="true" className="mr-1" />
+                </Link>
+              </li>
+            );
+          })}
         </ol>
 
-        <div className="mt-8 md:max-w-xl">
-          <ActionRow to="/programs" tone="mint">Lihat semua program GCC</ActionRow>
-        </div>
-      </PageContainer>
+        <Link to={assessmentAllPrograms.to} className="mt-6 flex min-h-[50px] items-center justify-between rounded-xl bg-white px-4 text-[15px] font-bold text-forest md:max-w-xl">
+          {assessmentAllPrograms.label}
+          <ArrowRight size={18} aria-hidden="true" />
+        </Link>
+      </div>
     </main>
   );
 }

@@ -8,7 +8,7 @@ export const learnHero = {
   title: ["Build Your", "Consulting Foundation"],
   description: "Bangun cara berpikir terstruktur, pelajari problem solving, dan latih komunikasi melalui proses belajar bersama GCC.",
   cta: { label: "Lihat GrowthCamp", to: "/learn/growthcamp" },
-  secondary: { label: "Belum yakin? Temukan jalurmu", to: "/pilih-program" },
+  secondary: { label: "Belum yakin? Temukan jalurmu", to: "/assessment" },
   // Placeholder from the homepage set until the dedicated documentation photo is supplied.
   photo: { src: heroFirstMeet, alt: "Sesi belajar bersama GCC", caption: "Sesi belajar bersama GCC" },
 };
@@ -65,5 +65,5 @@ export const learnFaq = {
 export const learnClosing = {
   title: ["Find Your", "Starting Point"],
   description: "Pilih jalur sesuai kebutuhan dan kesiapanmu saat ini.",
-  cta: { label: "Temukan Jalurmu", to: "/pilih-program" },
+  cta: { label: "Temukan Jalurmu", to: "/assessment" },
 };

@@ -67,7 +67,7 @@ export function PhotoFrame({ src, alt, caption, className = "" }: { src?: string
 
 export type FaqItem = { question: string; answer: string };
 
-export function FaqList({ items, label }: { items: FaqItem[]; label: string }) {
+export function FaqList({ items, label, tone = "mint" }: { items: FaqItem[]; label: string; tone?: "mint" | "glass" }) {
   const [open, setOpen] = useState(0);
   return (
     <ul aria-label={label} className="flex flex-col gap-4">
@@ -75,7 +75,7 @@ export function FaqList({ items, label }: { items: FaqItem[]; label: string }) {
         const expanded = open === index;
         const panelId = `faq-panel-${index}`;
         return (
-          <li key={item.question} className={`rounded-2xl border ${expanded ? "border-transparent bg-mint" : "border-line/60 bg-white"}`}>
+          <li key={item.question} className={`rounded-2xl border ${tone === "glass" ? (expanded ? "border-transparent bg-white" : "border-white/40 bg-white/70") : expanded ? "border-transparent bg-mint" : "border-line/60 bg-white"}`}>
             <h3>
               <button
                 type="button"

@@ -131,7 +131,7 @@ export default function Navbar() {
                 <span className="flex-1 text-center">Jelajahi Program</span>
                 <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <Link to="/pilih-program" onClick={close} className={buttonStyles({ variant: "outline", size: "md", fullWidth: true, className: "border-teal-deep text-sm" })}>
+              <Link to="/assessment" onClick={close} className={buttonStyles({ variant: "outline", size: "md", fullWidth: true, className: "border-teal-deep text-sm" })}>
                 <span className="flex-1 text-center">Temukan Jalurmu</span>
                 <ArrowRight size={18} aria-hidden="true" />
               </Link>
