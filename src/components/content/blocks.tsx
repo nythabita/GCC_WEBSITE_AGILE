@@ -21,7 +21,7 @@ export function DisplayTitle({ children, as: Tag = "h2", className = "" }: { chi
 export function BackLink({ to, children }: { to: string; children: ReactNode }) {
   return (
     <Link to={to} className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-teal-deep">
-      <ChevronLeft size={16} aria-hidden="true" />
+      <ChevronLeft size={16} aria-hidden="true" className="text-brand-blue" />
       {children}
     </Link>
   );
@@ -116,8 +116,8 @@ const stepTones: Record<Step["tone"], string> = {
   sun: "bg-sun/60 text-forest",
 };
 
-export function StepBadge({ number, tone }: Pick<Step, "number" | "tone">) {
-  return <span className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${stepTones[tone]}`}>{number}</span>;
+export function StepBadge({ number, tone, className = "" }: Pick<Step, "number" | "tone"> & { className?: string }) {
+  return <span className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${stepTones[tone]} ${className}`}>{number}</span>;
 }
 
 export function StepTimeline({ steps }: { steps: Step[] }) {

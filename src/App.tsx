@@ -10,6 +10,7 @@ import HomePage from "./pages/HomePage";
 import DiscoverPage from "./pages/DiscoverPage";
 import AssessmentPage from "./pages/AssessmentPage";
 import ProgramsPage from "./pages/ProgramsPage";
+import GrowthXPage from "./pages/GrowthXPage";
 import { homepageDraft } from "./data/homepage-draft";
 
 // Scroll to the hash target after client-side navigation (e.g. the drawer's "/#programs" link).
@@ -41,7 +42,8 @@ export default function App() {
         <Route path="/programs" element={<ProgramsPage />} />
         <Route path="/pilih-program" element={<Navigate to="/assessment" replace />} />
         <Route path="/learn/growthcamp" element={<PreviewPage title="GrowthCamp" description="Detail program GrowthCamp sedang disiapkan." />} />
-        <Route path="/apply/growthx" element={<PreviewPage title="GrowthX" description="Detail program GrowthX sedang disiapkan." />} />
+        <Route path="/apply/growthx" element={<GrowthXPage />} />
+        <Route path="/apply/growthx/form" element={<PreviewPage title="Formulir GrowthX" description="Formulir minat GrowthX sedang disiapkan." />} />
         <Route path="/apply/growthconnect" element={<PreviewPage title="GrowthConnect" description="Detail program GrowthConnect sedang disiapkan." />} />
         <Route path="/login" element={<PreviewPage title="Login" description="Akses akun anggota sedang disiapkan." />} />
         <Route path="*" element={<HomePage content={homepageDraft} />} />
