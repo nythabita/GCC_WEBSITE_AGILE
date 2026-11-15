@@ -7,7 +7,7 @@ export default function AboutSection({ content }: { content: HomepageContent["ab
         <h2 id="about-title" className="text-center font-display text-2xl font-bold text-paper md:text-4xl">{content.title}</h2>
       </div>
       <div className="bg-sun">
-        <p className="mx-auto max-w-3xl px-6 py-6 text-center font-ui text-base font-bold leading-[1.25] text-forest md:py-10 md:text-xl">{content.description}</p>
+        <p className="mx-auto max-w-3xl px-6 py-[11px] text-center font-ui text-base font-bold leading-[1.25] text-forest md:py-10 md:text-xl">{content.description}</p>
       </div>
     </section>
   );

@@ -10,13 +10,13 @@ const portraits = {
 
 export default function MentorsSection() {
   return (
-    <section aria-labelledby="mentors-title" className="pt-[75px] md:pt-28">
+    <section aria-labelledby="mentors-title" className="pt-[45px] md:pt-28">
       <div className="mx-auto w-full max-w-7xl px-6 md:px-8">
         <img src={divider} alt="" aria-hidden="true" className="mx-auto block h-[3px] w-full max-w-[316px] md:max-w-xl" />
         <h2 id="mentors-title" className="mx-auto mt-[77px] max-w-[327px] text-center font-display text-[32px] font-bold italic leading-tight text-mist md:mt-16 md:max-w-none md:text-5xl">
           {mentors.title}
         </h2>
-        <ul className="mt-[38px] flex flex-col gap-3 md:mt-14 md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-14">
+        <ul className="mt-[23px] flex flex-col gap-[17px] md:mt-14 md:grid md:grid-cols-2 md:gap-x-12 md:gap-y-14">
           {mentors.items.map((mentor) => {
             const portrait = portraits[mentor.portrait];
             return (

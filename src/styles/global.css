@@ -3,13 +3,16 @@
 @import "@fontsource-variable/montserrat";
 
 /* EB Garamond (SIL OFL, see assets/fonts/EBGaramond-OFL.txt) stands in for the design's Apple Garamond,
-   whose web licence was never confirmed. Latin subset, bold weights only (the design only uses bold). */
+   whose web licence was never confirmed. Latin subset, bold weights only (the design only uses bold).
+   size-adjust: EB Garamond renders ~11% wider than Apple Garamond at the same px size (measured on
+   "Think Structurally.": 260px vs 231px in Figma), so 89% matches the designed text widths exactly; 80% is a deliberate extra reduction. */
 @font-face {
   font-family: "EB Garamond";
   src: url("../assets/fonts/EBGaramond-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
+  size-adjust: 80%;
 }
 @font-face {
   font-family: "EB Garamond";
@@ -17,6 +20,7 @@
   font-weight: 700;
   font-style: italic;
   font-display: swap;
+  size-adjust: 80%;
 }
 /* Budget 2012 (listed as freeware on FontSpace; confirm the licence allows commercial web use). */
 @font-face {

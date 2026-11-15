@@ -26,7 +26,7 @@ const captionSizes = [6, 7, 9];
 
 export default function WinnersSection() {
   return (
-    <section aria-labelledby="winners-title" className="overflow-hidden pt-6 md:pt-16">
+    <section aria-labelledby="winners-title" className="overflow-hidden pt-1 md:pt-16">
       <div className="@container relative mx-auto w-full max-w-[390px] md:max-w-[560px]" style={{ aspectRatio: `${BOX.w} / ${BOX.h}` }}>
         <img src={trophy} alt="" aria-hidden="true" className="pointer-events-none select-none" style={{ ...pinStyle({ cx: 172, cy: 409, w: 541.7, rotate: 27.33 }, BOX), aspectRatio: "1" }} />
         {stars.map((pin, index) => (

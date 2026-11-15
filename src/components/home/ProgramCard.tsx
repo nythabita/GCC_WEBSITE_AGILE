@@ -16,7 +16,7 @@ export default function ProgramCard({ program, variant = "home" }: Props) {
 
   return (
     <article aria-labelledby={titleId} className="mx-auto w-full max-w-[326px] md:max-w-none">
-      <div className={`relative mx-auto min-h-[419px] w-full overflow-hidden rounded-[15px] bg-brand-green px-4 pb-14 pt-4 text-white md:max-w-none ${explore ? "max-w-[342px]" : "max-w-[296px]"}`}>
+      <div className={`relative mx-auto min-h-[419px] w-full overflow-hidden rounded-[15px] bg-brand-green px-4 pb-8 pt-4 text-white md:max-w-none ${explore ? "max-w-[342px]" : "max-w-[296px]"}`}>
         <img src={programCardBackground} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-5" />
         <div className="relative">
           <div className="flex items-start justify-between gap-2">
@@ -32,7 +32,7 @@ export default function ProgramCard({ program, variant = "home" }: Props) {
               What will you learn?
             </p>
           )}
-          <ul className={`mt-3 flex flex-col ${explore ? "gap-5" : "gap-[22px]"}`}>
+          <ul className={`mt-3 flex flex-col ${explore ? "gap-4" : "gap-[14px]"}`}>
             {program.benefits.map((benefit) => (
               <li key={benefit} className="grid grid-cols-[25px_1fr] items-start gap-x-3">
                 <img src={iconCheck} alt="" aria-hidden="true" className="size-[25px]" />

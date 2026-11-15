@@ -11,12 +11,12 @@ const contact = {
 export default function Footer() {
   return (
     <footer className="border-t-[3px] border-teal-deep bg-brand-green text-white">
-      <div className="mx-auto grid w-full max-w-7xl gap-8 px-6 pb-8 pt-6 md:grid-cols-[1.4fr_1fr_1.2fr] md:gap-12 md:px-8 md:pt-12">
+      <div className="mx-auto grid w-full max-w-7xl gap-5 px-6 pb-0 pt-6 md:grid-cols-[1.4fr_1fr_1.2fr] md:gap-12 md:px-8 md:pt-12">
         <div>
           <Link to="/" aria-label="Growth Consulting — Beranda" className="inline-block">
             <img src={logoGccWhite} alt="Growth Consulting" width={146} height={51} className="block h-auto w-[146px]" />
           </Link>
-          <p className="mt-5 max-w-[342px] text-sm leading-snug">
+          <p className="mt-3 max-w-[342px] text-sm leading-snug">
             Komunitas pengembangan profesional bagi mahasiswa yang ingin mengenal dan mengeksplorasi industri consulting.
           </p>
         </div>
@@ -42,7 +42,7 @@ export default function Footer() {
       </div>
 
       <div className="mx-auto w-full max-w-7xl px-6 md:px-8">
-        <p className="border-t border-sage/30 py-3 text-[11px] text-sage">Growth Consulting Club</p>
+        <p className="border-t border-sage/30 py-2 text-[11px] text-sage">Growth Consulting Club</p>
       </div>
     </footer>
   );
