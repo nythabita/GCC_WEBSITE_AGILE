@@ -1,0 +1,48 @@
+# PROGRESS — sesi tanpa pengawasan (16 Nov 2026)
+
+Berhenti karena batas kuota: halaman pertama memakai ±53% limit 5 jam (sudah termasuk setup), jadi sisa kuota diperkirakan kurang dari 2x biaya satu halaman. Working tree bersih, tidak ada yang di-push.
+
+## Selesai
+
+| Commit | Isi |
+|---|---|
+| `c3852e0` | GrowthX landing `/apply/growthx`, komponen bersama `src/components/program/sections.tsx`, data `src/data/growthx-content.ts`, foto `src/assets/program/`, skrip QA `docs/qa/audit.mjs` dan `docs/qa/compare.py`, route placeholder `/apply/growthx/form` |
+
+Cek lolos: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/routes.mjs` (semua route OK, ditambah `/apply/growthx/form`).
+Audit posisi vertikal vs PDF (`audit.mjs`): 190 blok teks cocok, selisih rata-rata kecil, terburuk ±100px dari ±9000px (tinggi halaman ±8.7k vs 9270 di desain; footer & beberapa kartu masih sedikit lebih rapat).
+
+## Belum
+
+1. **GrowthConnect** `/apply/growthconnect` (landing; sumber `4. PAGE APPLY - GROWTHCONNECT.pdf`). Bisa langsung memakai `sections.tsx` (SectionHead, CardStack, LabeledList, Timeline, CaseCard, FaqSection, BerryClosing). Beda dengan GrowthX: kartu pakai judul serif, "Tell Us the Real Problem" = 5 pertanyaan (LabeledList label "Pertanyaan"), tidak ada foto hero, logo `logoGrowthConnect`.
+2. **GrowthCamp** `/learn/growthcamp` (sumber `2. PAGE LEARN.pdf`, frame ke-2 `l_b` = landing panjang). Frame ke-1 (`l_a`) adalah halaman Learn terbaru (`/learn` perlu dibangun ulang).
+3. Form multi-langkah per program (GrowthX 6 layar, GrowthConnect 6, GrowthCamp 7: kontak, isian, review, "Simulasi Selesai"), Login/Loading, dialog.
+4. Halaman Learn terbaru.
+
+## Cara lanjut (koordinat frame di PDF, y0=267, zoom 1)
+
+Perintah ekstraksi yang dipakai (jalankan dari `docs/qa`, output ke folder sementara di luar repo):
+
+```
+python -I pdf_extract.py "<pdf>" <outdir> --y0=267 --zoom=1 <name>:<x>:392:<tinggi> ...
+```
+
+- GrowthX: `x_landing:602:392:9270 x_f1:1162 x_f2:1606 x_f3:2052 x_f4:2496 x_f5:2942 x_f6:3386` (form tinggi ±3600; tinggi sebenarnya perlu dicek per frame).
+- GrowthConnect: `c_landing:76:392:10223 c_f1:619 c_f2:1066 c_f3:1509 c_f4:1956 c_f5:2399 c_f6:2846`.
+- Learn: `l_a:296 (tinggi ±4500) l_b:796:392:8270 l_c:1249 l_d:1749 l_e:2209 l_f:2669 l_g:3129 l_h:3589`.
+- Alur kerja per halaman: ekstrak, bangun, `node docs/qa/audit.mjs <url> <frame>.txt` (selisih y per baris teks), `python -I docs/qa/compare.py` (berdampingan), lalu tsc/oxlint/build/routes.
+- Folder ekstraksi sementara (`D:\agile_web\scratch`) bisa hilang; ulangi perintah di atas bila perlu. Catatan: `npm i playwright-core` di `docs/qa` ternyata menulis ke `package.json` root; jangan di-commit (sudah dikembalikan).
+
+## Keputusan default yang diambil
+
+- Teks Inter di desain terlihat ±3,6% lebih lebar dari Inter Variable kita; di halaman program dipakai `tracking-[0.02em]` pada `<main>` (heading serif/brand `tracking-normal`). Paragraf diberi `-mr-2.5` di mobile agar baris pecah sama dengan desain (kotak teks Figma lebih lebar dari kartu).
+- Judul serif dinaikkan ±10% (31/37px) mengikuti aturan HANDOFF; nama program (`font-brand`) 34px.
+- Badge langkah timeline memakai `teal-deep` (di desain hijau tua), langkah ke-3 `rose`.
+- Chevron `BackLink` di `blocks.tsx` diberi warna biru (`brand-blue`) seperti di desain; komponen itu dipakai bersama.
+- CTA "Ajukan Minat GrowthX" menuju `/apply/growthx/form` (Coming Soon sampai form dibangun). "Lihat contoh kasus" ke `/apply` (belum ada halaman kasus).
+- Foto hero & kolaborasi GrowthX diekstrak dari PDF (webp ±900px). Ikon toko memakai aset yang sudah ada. Ikon "Analysis" di kartu kontribusi memakai `Goal` (di desain ikon target-panah serupa).
+
+## Perlu ditinjau manusia
+
+- **Jawaban FAQ GrowthX**: Figma hanya menampilkan jawaban pertama ("Belum. GCC meninjau..."). Tiga jawaban lain dirangkai dari kalimat di halaman yang sama; ada penanda `TODO(review)` di `src/data/growthx-content.ts`.
+- Warna hijau memakai `#00C090` (keputusan pemilik), bukan `#00B58C` dari PDF.
+- Lisensi Budget 2012 dan penggantian EB Garamond masih perlu dikonfirmasi (lihat HANDOFF).
