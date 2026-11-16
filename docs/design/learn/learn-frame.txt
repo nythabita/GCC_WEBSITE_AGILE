@@ -1,0 +1,88 @@
+   32 x278  13.0 Learn
+  121 x 27  11.0 LEARN WITH GCC
+  152 x 27  28.6 Build Your
+  185 x 27  39.0 Consulting Foundation
+  239 x 27  16.0 Bangun cara berpikir terstruktur, pelajari
+  263 x 27  15.8 problem solving, dan latih komunikasi melalui
+  287 x 27  16.0 proses belajar bersama GCC.
+  353 x118  15.0 Lihat GrowthCamp
+  403 x 27  14.0 Belum yakin? Temukan jalurmu
+  646 x 64  20.0 Onboarding GrowthCamp 2025
+  696 x 27  11.0 FONDASI YANG DIKEMBANGKAN
+  726 x 27  34.0 Skills to Start With
+  776 x 27  15.9 Kenali kemampuan yang dilatih dalam proses
+  800 x 27  16.0 belajar.
+  870 x 66  17.0 01 Critical Thinking
+  911 x 45  16.0 Memahami konteks dan menyusun
+  935 x 45  16.0 pertanyaan yang tepat.
+ 1024 x 66  17.0 02 Problem Solving
+ 1066 x 45  16.0 Memecah masalah dan menyusun
+ 1090 x 45  16.0 alternatif solusi.
+ 1179 x 66  17.0 03 Communication
+ 1221 x 45  15.9 Menyampaikan analisis dan rekomendasi
+ 1245 x 45  16.0 secara jelas.
+ 1405 x 27  29.0 GrowthCamp
+ 1452 x 27  20.0 Learn the Fundamentals.
+ 1479 x 27  20.0 Practice with Purpose.
+ 1526 x 27  16.0 Bootcamp untuk mahasiswa yang ingin
+ 1550 x 27  16.0 membangun fondasi consulting dan problem
+ 1575 x 27  15.6 solving sebelum mengeksplorasi pengalaman
+ 1598 x 27  16.0 proyek.
+ 1825 x 97  20.0 Workshop GrowthCamp
+ 1877 x 27  16.0 Untuk mahasiswa
+ 1903 x 27  16.0 Yang ingin membangun fondasi consulting.
+ 1943 x 27  16.0 Fokus awal
+ 1969 x 27  15.9 Motivasi, minat belajar, dan komitmen waktu.
+ 2021 x 27  18.0 Gambaran pembelajaran
+ 2073 x 75  15.0 Think Like a Consultant
+ 2142 x 75  15.0 Turn Insights into Solutions
+ 2212 x 75  15.0 Take on a Business Case
+ 2282 x 75  15.0 Present Your Recommendations
+ 2366 x 96  15.0 Lihat detail GrowthCamp
+ 2417 x 27  12.6 Jadwal dan ketentuan ditampilkan setelah terkonfirmasi.
+ 2517 x 27  28.0 From Learning
+ 2551 x 27  34.0 to Practice
+ 2601 x 27  16.0 Kenali langkah pengembangan yang dapat
+ 2625 x 27  16.0 kamu jelajahi.
+ 2677 x 83  17.0 Bangun fondasi
+ 2687 x 40  12.0 01
+ 2706 x 83  15.0 Pelajari konsep melalui GrowthCamp.
+ 2791 x 83  17.0 Latih penerapan
+ 2800 x 40  12.0 02
+ 2820 x 83  15.0 Gunakan studi kasus dan diskusi untuk
+ 2842 x 83  15.0 melatih analisis.
+ 2904 x 83  17.0 Jelajahi pengalaman proyek
+ 2913 x 40  12.0 03
+ 2933 x 83  15.0 Pelajari GrowthX dan proses tinjauan
+ 2955 x 83  15.0 kesiapan untuk berkontribusi.
+ 3025 x 27  14.0 Partisipasi proyek mengikuti proses tinjauan GCC.
+ 3083 x129  15.0 Kenali GrowthX
+ 3192 x 27  34.0 Good to Know
+ 3269 x 43  16.0 Apakah harus punya pengalaman
+ 3291 x 43  16.0 consulting?
+ 3329 x 43  15.0 GrowthCamp ditujukan untuk membangun
+ 3352 x 43  15.0 fondasi. Periksa persyaratan pada halaman
+ 3375 x 43  15.0 detail program.
+ 3451 x 43  16.0 Apakah setelah belajar langsung
+ 3473 x 43  16.0 mendapat proyek?
+ 3548 x 43  16.0 Di mana saya melihat jadwal dan
+ 3571 x 43  16.0 ketentuan?
+ 3689 x 47  26.4 Find Your
+ 3721 x 47  34.0 Starting Point
+ 3771 x 47  16.0 Pilih jalur sesuai kebutuhan dan
+ 3795 x 47  16.0 kesiapanmu saat ini.
+ 3860 x121  15.0 Temukan Jalurmu
+ 4048 x 27  14.0 Komunitas pengembangan profesional bagi
+ 4065 x 27  14.0 mahasiswa yang ingin mengenal dan
+ 4082 x 27  14.0 mengeksplorasi industri consulting.
+ 4118 x 27  14.0 Kontak
+ 4145 x 27  13.0 consultanttogether@gmail.com
+ 4169 x 27  13.0 @growthconsulting.c
+ 4221 x 27  14.0 Navigasi
+ 4257 x 27  14.0 Discover
+ 4257 x198  14.0 Learn
+ 4299 x 27  14.0 Apply
+ 4299 x198  14.0 Grow
+ 4341 x 27  14.0 Tentang GCC
+ 4341 x198  14.0 Assessment
+ 4385 x 27  11.0 Growth Consulting Club
