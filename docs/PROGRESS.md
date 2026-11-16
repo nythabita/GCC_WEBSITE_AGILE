@@ -15,16 +15,17 @@ Cek lolos tiap halaman: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/r
 
 ## Form (mesin berbasis konfigurasi)
 
-- Mesin: `src/components/form/ProgramForm.tsx` + tipe `src/components/form/types.ts` (field text/radio/textarea+hitung kata/checkboxes dengan batas/perSelection/consent/group, validasi per langkah, review otomatis, layar "Simulasi Selesai"). Jawaban hanya di state, tidak dikirim/disimpan.
-- GrowthX: `src/data/forms/growthx-form.ts` di route `/apply/growthx/form` (5 langkah). Uji alur: `node docs/qa/form-flow.mjs <baseUrl>` (15 cek).
-- Form GrowthConnect dan GrowthCamp tinggal membuat file konfigurasi serupa dari frame PDF-nya (`c_f1..c_f6`, `l_c..l_h`) dan memasangnya di `App.tsx`.
-- Keputusan default: varian WhatsApp pada kolom kontak (label "Nomor WhatsApp aktif", placeholder contoh) dan kata "terisi" pada daftar review ditulis sendiri (Figma hanya menunjukkan keadaan kosong). Tombol "Selesaikan Simulasi" nonaktif selama masih ada jawaban wajib kosong.
+- Mesin: `src/components/form/ProgramForm.tsx` + tipe `src/components/form/types.ts`. Field: text (opsi "alternative", varian dinamis), radio, textarea + hitung kata, checkboxes (batas, opsi eksklusif), perSelection, consent, matrix, note, group; `showIf` dan `requiredWhen`; validasi per langkah, review otomatis, layar "Simulasi Selesai". Jawaban hanya di state, tidak dikirim/disimpan.
+- Konfigurasi: `src/data/forms/growthx-form.ts` (`/apply/growthx/form`), `growthconnect-form.ts` (`/apply/growthconnect/form`), `growthcamp-form.ts` (`/learn/growthcamp/form`); tiap form 5 langkah + selesai.
+- Uji: `node docs/qa/form-flow.mjs <baseUrl>` (alur GrowthX, 15 cek) dan `node docs/qa/form-fill.mjs <baseUrl>` (isi otomatis ketiga form sampai selesai, 18 cek).
+- Keputusan default: varian WhatsApp pada kolom kontak (label "Nomor WhatsApp aktif" + placeholder contoh) dan kata "terisi" pada daftar review ditulis sendiri (Figma hanya menunjukkan keadaan kosong). Tombol "Selesaikan Simulasi" nonaktif selama ada jawaban wajib kosong. Di GrowthConnect, kolom "Kisaran anggaran" baru tampil setelah memilih "Memiliki kisaran" (di Figma terlihat di keadaan kosong dengan catatan "ditampilkan jika memilih..."). Teks pesan error ("Wajib diisi.", dst.) ditulis sendiri.
+- Frame Figma GrowthCamp pertama (`l_c`) menampilkan tombol "Kembali ke program" dan tanpa tautan "Kembali ke GrowthCamp" di atas; semua langkah memakai tautan atas yang sama.
 
 ## Belum
 
-1. Form GrowthConnect dan GrowthCamp (konfigurasi saja).
-2. Halaman Learn terbaru (`/learn`; frame ke-1 `l_a` di `2. PAGE LEARN.pdf`, perlu diekstrak ulang dengan tinggi ±4500).
-3. Login/Loading, dialog.
+1. Halaman Learn terbaru (`/learn`; frame ke-1 `l_a` di `2. PAGE LEARN.pdf`, perlu diekstrak ulang dengan tinggi ±4500).
+2. Login/Loading dan dialog.
+3. Tinjau kembali tinggi halaman landing/form vs desain bila perlu (selisih ±3-5%).
 
 ## Cara lanjut (koordinat frame di PDF, y0=267, zoom 1)
 

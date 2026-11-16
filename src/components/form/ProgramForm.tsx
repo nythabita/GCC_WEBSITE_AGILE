@@ -3,53 +3,68 @@ import { Link } from "react-router";
 import { ArrowRight, Info } from "lucide-react";
 import { buttonStyles } from "../UI/button-styles";
 import { BackLink, Eyebrow, PageContainer } from "../content/blocks";
-import type { Answers, Field, FormConfig, FormStep, TextareaField, TextField } from "./types";
+import type { Answers, CheckboxesField, Field, FormConfig, FormStep, MatrixField, TextareaField, TextField } from "./types";
 
 // Config-driven multi-step form (see ./types.ts). Mobile-first, one column; desktop keeps a centred 2xl column.
 
-const inputBase = "block w-full rounded-xl border border-line/70 bg-white px-4 text-sm font-semibold text-forest placeholder:text-forest focus:border-brand-blue";
+const inputBase = "block w-full rounded-xl border border-line/70 bg-white px-4 text-sm font-semibold text-forest placeholder:text-forest focus:border-brand-blue disabled:opacity-60";
+const optionClass = "flex min-h-[54px] cursor-pointer items-center gap-3 rounded-xl border border-line/70 bg-white px-4 py-3 text-[15px] font-semibold leading-[23px] text-forest has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
+const numberWords: Record<number, string> = { 1: "satu", 2: "dua", 3: "tiga", 4: "empat" };
+
+type Flat = Exclude<Field, { type: "group" }>;
+type SetValue = (id: string, value: string | string[]) => void;
 
 const countWords = (text: string) => (text.trim() ? text.trim().split(/\s+/).length : 0);
 const asText = (value: Answers[string] | undefined) => (typeof value === "string" ? value : "");
 const asList = (value: Answers[string] | undefined) => (Array.isArray(value) ? value : []);
 
-function flatten(fields: Field[]): Exclude<Field, { type: "group" }>[] {
-  return fields.flatMap((field) => (field.type === "group" ? field.fields : [field]));
+function flatten(fields: Field[]): Flat[] {
+  return fields.flatMap((field): Flat[] => (field.type === "group" ? field.fields : [field]));
 }
+
+function isVisible(field: Field, answers: Answers) {
+  if (!field.showIf) return true;
+  const value = answers[field.showIf.field];
+  return Array.isArray(value) ? value.includes(field.showIf.equals) : value === field.showIf.equals;
+}
+
+function isRequired(field: Field, answers: Answers) {
+  if (field.requiredWhen) return asList(answers[field.requiredWhen.field]).some((item) => item !== field.requiredWhen!.anyBut);
+  return Boolean(field.required);
+}
+
+const marksRequired = (field: Field) => Boolean(field.required || field.requiredWhen);
 
 function resolveText(field: TextField, answers: Answers) {
   const variant = field.dynamic ? field.dynamic.map[asText(answers[field.dynamic.by])] : undefined;
   return { label: variant?.label ?? field.label, placeholder: variant?.placeholder ?? field.placeholder, inputMode: variant?.inputMode ?? field.inputMode };
 }
 
-function isAnswered(field: Field, answers: Answers): boolean {
-  const value = answers[field.id];
-  if (field.type === "checkboxes") return asList(value).length > 0;
-  if (field.type === "consent") return value === "yes";
-  if (field.type === "perSelection") return asText(answers[`${field.id}.0`]).trim() !== "";
-  return asText(value).trim() !== "";
-}
-
-function isRequired(field: Field) {
-  return Boolean(field.required);
+function isAnswered(field: Flat, answers: Answers): boolean {
+  switch (field.type) {
+    case "checkboxes": return asList(answers[field.id]).length > 0;
+    case "consent": return answers[field.id] === "yes";
+    case "perSelection": return asText(answers[`${field.id}.0`]).trim() !== "";
+    case "matrix": return field.rows.every((_, index) => asText(answers[`${field.id}.${index}`]) !== "");
+    case "note": return false;
+    case "text": return asText(answers[field.id]).trim() !== "" || answers[`${field.id}.alt`] === "yes";
+    default: return asText(answers[field.id]).trim() !== "";
+  }
 }
 
 // Returns an error message per field id (perSelection uses `${id}.0` / `${id}.1`).
 function validate(fields: Field[], answers: Answers): Record<string, string> {
   const errors: Record<string, string> = {};
   for (const field of flatten(fields)) {
+    if (field.type === "note" || !isVisible(field, answers)) continue;
+    const required = isRequired(field, answers);
     if (field.type === "perSelection") {
-      const selected = asList(answers[field.from]).length;
-      if (isRequired(field) && !asText(answers[`${field.id}.0`]).trim()) errors[`${field.id}.0`] = "Wajib diisi.";
-      if (selected >= 2 && !asText(answers[`${field.id}.1`]).trim()) errors[`${field.id}.1`] = "Wajib diisi.";
+      if (required && !asText(answers[`${field.id}.0`]).trim()) errors[`${field.id}.0`] = "Wajib diisi.";
+      if (asList(answers[field.from]).length >= 2 && !asText(answers[`${field.id}.1`]).trim()) errors[`${field.id}.1`] = "Wajib diisi.";
       continue;
     }
-    if (field.type === "consent") {
-      if (isRequired(field) && !isAnswered(field, answers)) errors[field.id] = "Centang untuk melanjutkan.";
-      continue;
-    }
-    if (isRequired(field) && !isAnswered(field, answers)) {
-      errors[field.id] = field.type === "checkboxes" ? "Pilih minimal satu." : "Wajib diisi.";
+    if (required && !isAnswered(field, answers)) {
+      errors[field.id] = field.type === "consent" ? "Centang untuk melanjutkan." : field.type === "checkboxes" ? "Pilih minimal satu." : field.type === "matrix" || field.type === "radio" ? "Pilih satu jawaban." : "Wajib diisi.";
       continue;
     }
     const text = asText(answers[field.id]).trim();
@@ -64,30 +79,28 @@ function validate(fields: Field[], answers: Answers): Record<string, string> {
   return errors;
 }
 
-function FieldBlock({ id, label, required, hint, error, children, as = "label" }: { id: string; label: string; required?: boolean; hint?: string; error?: string; children: ReactNode; as?: "label" | "legend" }) {
-  const text = (
-    <>
-      {label}
-      {required ? " *" : ""}
-    </>
-  );
-  const labelClass = "block text-base font-semibold leading-6 text-forest";
+function FieldBlock({ id, label, required, hint, error, children, as = "label", sub = false }: { id: string; label: string; required?: boolean; hint?: string; error?: string; children: ReactNode; as?: "label" | "legend"; sub?: boolean }) {
+  const text = <>{label}{required ? " *" : ""}</>;
+  const labelClass = sub ? "block text-sm font-semibold leading-5 text-forest" : "block text-base font-semibold leading-6 text-forest";
   return (
-    <div className="mt-[26px]">
+    <div className={sub ? "mt-6" : "mt-[26px]"}>
       {as === "legend" ? <legend className={`${labelClass} float-left w-full`}>{text}</legend> : <label htmlFor={id} className={labelClass}>{text}</label>}
-      {hint && <p id={`${id}-hint`} className="mt-2 clear-both text-[13px] font-semibold leading-5 text-forest/80">{hint}</p>}
-      <div className="clear-both mt-4">{children}</div>
+      {hint && <p id={`${id}-hint`} className="mt-3 clear-both text-[13px] font-semibold leading-5 text-forest/80">{hint}</p>}
+      <div className={`clear-both ${sub ? "mt-3" : "mt-5"}`}>{children}</div>
       {error && <p id={`${id}-error`} role="alert" className="mt-2 text-[13px] font-semibold text-berry">{error}</p>}
     </div>
   );
 }
 
-function TextInput({ field, answers, set, error }: { field: TextField; answers: Answers; set: (id: string, value: string) => void; error?: string }) {
+const describedBy = (id: string, hint?: string, error?: string) => [hint ? `${id}-hint` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
+
+function TextInput({ field, answers, set, error, sub }: { field: TextField; answers: Answers; set: SetValue; error?: string; sub: boolean }) {
   const uid = useId();
   const { label, placeholder, inputMode } = resolveText(field, answers);
   const id = `${uid}-${field.id}`;
+  const alt = answers[`${field.id}.alt`] === "yes";
   return (
-    <FieldBlock id={id} label={label} required={isRequired(field)} hint={field.hint} error={error}>
+    <FieldBlock id={id} label={label} required={marksRequired(field)} hint={field.hint} error={error} sub={sub}>
       <input
         id={id}
         name={field.id}
@@ -96,24 +109,31 @@ function TextInput({ field, answers, set, error }: { field: TextField; answers: 
         autoComplete="off"
         placeholder={placeholder}
         value={asText(answers[field.id])}
+        disabled={alt}
         onChange={(event) => set(field.id, event.target.value)}
         aria-invalid={error ? true : undefined}
-        aria-describedby={[field.hint ? `${id}-hint` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined}
+        aria-describedby={describedBy(id, field.hint, error)}
         data-field={field.id}
         className={`${inputBase} h-[52px] ${error ? "!border-berry" : ""}`}
       />
+      {field.alternative && (
+        <label className={`${optionClass} mt-3`}>
+          <input type="checkbox" checked={alt} onChange={(event) => { set(`${field.id}.alt`, event.target.checked ? "yes" : ""); if (event.target.checked) set(field.id, ""); }} className="size-5 shrink-0 accent-brand-green" />
+          {field.alternative}
+        </label>
+      )}
     </FieldBlock>
   );
 }
 
-function Textarea({ field, answers, set, error, sub = false, valueKey, label }: { field: TextareaField; answers: Answers; set: (id: string, value: string) => void; error?: string; sub?: boolean; valueKey?: string; label?: string }) {
+function Textarea({ field, answers, set, error, sub = false, valueKey, label }: { field: TextareaField; answers: Answers; set: SetValue; error?: string; sub?: boolean; valueKey?: string; label?: string }) {
   const uid = useId();
   const key = valueKey ?? field.id;
   const id = `${uid}-${key}`;
   const value = asText(answers[key]);
   const words = countWords(value);
-  const textarea = (
-    <>
+  return (
+    <FieldBlock id={id} label={label ?? field.label} required={marksRequired(field)} hint={field.hint} error={error} sub={sub}>
       <textarea
         id={id}
         name={key}
@@ -122,77 +142,108 @@ function Textarea({ field, answers, set, error, sub = false, valueKey, label }: 
         value={value}
         onChange={(event) => set(key, event.target.value)}
         aria-invalid={error ? true : undefined}
-        aria-describedby={[field.hint ? `${id}-hint` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined}
+        aria-describedby={describedBy(id, field.hint, error)}
         data-field={key}
         className={`${inputBase} min-h-[124px] resize-y py-4 leading-5 ${error ? "!border-berry" : ""}`}
       />
       {field.maxWords && <p className={`mt-2 text-right text-xs font-semibold ${words > field.maxWords ? "text-berry" : "text-forest"}`}>{words} / {field.maxWords} kata</p>}
-    </>
-  );
-  if (sub) {
-    return (
-      <div className="mt-6">
-        <label htmlFor={id} className="block text-sm font-semibold text-forest">{label ?? field.label}{field.required ? " *" : ""}</label>
-        <div className="mt-3">{textarea}</div>
-        {error && <p id={`${id}-error`} role="alert" className="mt-2 text-[13px] font-semibold text-berry">{error}</p>}
-      </div>
-    );
-  }
-  return (
-    <FieldBlock id={id} label={label ?? field.label} required={isRequired(field)} hint={field.hint} error={error}>{textarea}</FieldBlock>
+    </FieldBlock>
   );
 }
 
-const optionClass = "flex min-h-[54px] cursor-pointer items-center gap-3 rounded-xl border border-line/70 bg-white px-4 py-3 text-[15px] font-semibold text-forest has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
-
-function FieldView({ field, answers, set, errors }: { field: Field; answers: Answers; set: (id: string, value: string | string[]) => void; errors: Record<string, string> }) {
+function Checkboxes({ field, answers, set, error, sub }: { field: CheckboxesField; answers: Answers; set: SetValue; error?: string; sub: boolean }) {
   const uid = useId();
-  const setText = (id: string, value: string) => set(id, value);
+  const selected = asList(answers[field.id]);
+  const counted = selected.filter((item) => item !== field.exclusive).length;
+  const hint = field.hint ?? (field.max ? `Pilih maksimal ${numberWords[field.max] ?? field.max}. ${counted} dari ${field.max} pilihan dipilih.` : undefined);
+  const toggle = (option: string, checked: boolean) => {
+    if (option === field.exclusive) return set(field.id, checked ? [] : [option]);
+    const rest = selected.filter((item) => item !== field.exclusive);
+    set(field.id, checked ? rest.filter((item) => item !== option) : [...rest, option]);
+  };
+  return (
+    <fieldset data-field={field.id}>
+      <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={marksRequired(field)} hint={hint} error={error} sub={sub}>
+        <div className="flex flex-col gap-3">
+          {field.options.map((option) => {
+            const checked = selected.includes(option);
+            const locked = !checked && option !== field.exclusive && field.max !== undefined && counted >= field.max;
+            return (
+              <label key={option} className={optionClass}>
+                <input type="checkbox" checked={checked} disabled={locked} onChange={() => toggle(option, checked)} className="size-5 shrink-0 accent-brand-green" />
+                {option}
+              </label>
+            );
+          })}
+        </div>
+      </FieldBlock>
+    </fieldset>
+  );
+}
+
+function Matrix({ field, answers, set, error }: { field: MatrixField; answers: Answers; set: SetValue; error?: string }) {
+  const uid = useId();
+  return (
+    <fieldset data-field={field.id}>
+      <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={marksRequired(field)} hint={field.hint} error={error}>
+        <div className="flex flex-col gap-8">
+          {field.rows.map((row, index) => (
+            <fieldset key={row}>
+              <legend className="text-[18px] font-semibold leading-6 text-forest">{row}</legend>
+              <div className="mt-4 flex flex-col gap-3">
+                {field.options.map((option) => (
+                  <label key={option} className={optionClass}>
+                    <input type="radio" name={`${field.id}.${index}`} checked={asText(answers[`${field.id}.${index}`]) === option} onChange={() => set(`${field.id}.${index}`, option)} className="size-5 shrink-0 accent-brand-green" />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+        </div>
+      </FieldBlock>
+    </fieldset>
+  );
+}
+
+function InfoCard({ title, text }: { title?: string; text: string }) {
+  return (
+    <div role="note" className="mt-8 flex gap-3 rounded-2xl bg-white p-5 text-forest">
+      <Info size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-brand-blue" />
+      <div>
+        {title && <p className="text-[13px] font-bold">{title}</p>}
+        <p className={`${title ? "mt-2" : ""} text-[13px] font-semibold leading-5`}>{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function FieldView({ field, answers, set, errors, sub = false }: { field: Field; answers: Answers; set: SetValue; errors: Record<string, string>; sub?: boolean }) {
+  const uid = useId();
+  if (!isVisible(field, answers)) return null;
   switch (field.type) {
     case "text":
-      return <TextInput field={field} answers={answers} set={setText} error={errors[field.id]} />;
+      return <TextInput field={field} answers={answers} set={set} error={errors[field.id]} sub={sub} />;
     case "textarea":
-      return <Textarea field={field} answers={answers} set={setText} error={errors[field.id]} />;
+      return <Textarea field={field} answers={answers} set={set} error={errors[field.id]} sub={sub} />;
+    case "checkboxes":
+      return <Checkboxes field={field} answers={answers} set={set} error={errors[field.id]} sub={sub} />;
+    case "matrix":
+      return <Matrix field={field} answers={answers} set={set} error={errors[field.id]} />;
+    case "note":
+      return <InfoCard title={field.title} text={field.text} />;
     case "radio": {
       const current = asText(answers[field.id]) || field.defaultValue || "";
       return (
         <fieldset data-field={field.id}>
-          <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={isRequired(field)} hint={field.hint} error={errors[field.id]}>
+          <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={marksRequired(field)} hint={field.hint} error={errors[field.id]}>
             <div className="flex flex-col gap-3">
               {field.options.map((option) => (
                 <label key={option.value} className={optionClass}>
-                  <input type="radio" name={field.id} value={option.value} checked={current === option.value} onChange={() => set(field.id, option.value)} className="size-5 accent-brand-green" />
+                  <input type="radio" name={field.id} value={option.value} checked={current === option.value} onChange={() => set(field.id, option.value)} className="size-5 shrink-0 accent-brand-green" />
                   {option.label}
                 </label>
               ))}
-            </div>
-          </FieldBlock>
-        </fieldset>
-      );
-    }
-    case "checkboxes": {
-      const selected = asList(answers[field.id]);
-      const hint = field.max ? `Pilih maksimal ${field.max === 2 ? "dua" : field.max}. ${selected.length} dari ${field.max} pilihan dipilih.` : field.hint;
-      return (
-        <fieldset data-field={field.id}>
-          <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={isRequired(field)} hint={hint} error={errors[field.id]}>
-            <div className="flex flex-col gap-3">
-              {field.options.map((option) => {
-                const checked = selected.includes(option);
-                const locked = !checked && field.max !== undefined && selected.length >= field.max;
-                return (
-                  <label key={option} className={optionClass}>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      disabled={locked}
-                      onChange={() => set(field.id, checked ? selected.filter((item) => item !== option) : [...selected, option])}
-                      className="size-5 accent-brand-green"
-                    />
-                    {option}
-                  </label>
-                );
-              })}
             </div>
           </FieldBlock>
         </fieldset>
@@ -203,9 +254,9 @@ function FieldView({ field, answers, set, errors }: { field: Field; answers: Ans
       const base: TextareaField = { id: field.id, type: "textarea", label: "", placeholder: field.placeholder };
       return (
         <fieldset data-field={`${field.id}.0`}>
-          <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={isRequired(field)} hint={field.hint}>
-            <Textarea sub field={{ ...base, required: true }} valueKey={`${field.id}.0`} label={selected[0] ? `${field.labels[0]}: ${selected[0]}` : field.labels[0]} answers={answers} set={setText} error={errors[`${field.id}.0`]} />
-            <Textarea sub field={{ ...base, required: selected.length >= 2 }} valueKey={`${field.id}.1`} label={selected[1] ? `${field.labels[1].replace(" (jika dipilih)", "")}: ${selected[1]}` : field.labels[1]} answers={answers} set={setText} error={errors[`${field.id}.1`]} />
+          <FieldBlock id={`${uid}-${field.id}`} as="legend" label={field.label} required={marksRequired(field)} hint={field.hint}>
+            <Textarea sub field={{ ...base, required: true }} valueKey={`${field.id}.0`} label={selected[0] ? `${field.labels[0]}: ${selected[0]}` : field.labels[0]} answers={answers} set={set} error={errors[`${field.id}.0`]} />
+            <Textarea sub field={{ ...base, required: selected.length >= 2 }} valueKey={`${field.id}.1`} label={selected[1] ? `${field.labels[1].replace(" (jika dipilih)", "")}: ${selected[1]}` : field.labels[1]} answers={answers} set={set} error={errors[`${field.id}.1`]} />
           </FieldBlock>
         </fieldset>
       );
@@ -214,8 +265,8 @@ function FieldView({ field, answers, set, errors }: { field: Field; answers: Ans
       const id = `${uid}-${field.id}`;
       return (
         <div className="mt-8" data-field={field.id}>
-          <p className="text-base font-semibold leading-6 text-forest">{field.label}{isRequired(field) ? " *" : ""}</p>
-          <label htmlFor={id} className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-line/70 bg-white p-4 text-[15px] font-semibold leading-[23px] text-forest has-[:checked]:border-brand-green">
+          <p className="text-base font-semibold leading-6 text-forest">{field.label}{marksRequired(field) ? " *" : ""}</p>
+          <label htmlFor={id} className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-line/70 bg-white p-4 text-[15px] font-semibold leading-[23px] text-forest">
             <input id={id} type="checkbox" checked={answers[field.id] === "yes"} onChange={(event) => set(field.id, event.target.checked ? "yes" : "")} aria-invalid={errors[field.id] ? true : undefined} className="mt-1 size-5 shrink-0 accent-brand-green" />
             {field.text}
           </label>
@@ -223,33 +274,15 @@ function FieldView({ field, answers, set, errors }: { field: Field; answers: Ans
         </div>
       );
     }
-    case "group": {
+    case "group":
       return (
         <fieldset className="mt-8" data-field={field.id}>
-          <legend className="text-base font-semibold leading-6 text-forest">{field.label}{isRequired(field) ? " *" : ""}</legend>
+          <legend className="text-base font-semibold leading-6 text-forest">{field.label}{marksRequired(field) ? " *" : ""}</legend>
           {field.hint && <p className="mt-2 text-[13px] font-semibold text-forest/80">{field.hint}</p>}
-          {field.fields.map((sub) =>
-            sub.type === "text" ? (
-              <SubText key={sub.id} field={sub} answers={answers} set={setText} error={errors[sub.id]} />
-            ) : (
-              <Textarea key={sub.id} sub field={sub} answers={answers} set={setText} error={errors[sub.id]} />
-            ),
-          )}
+          {field.fields.map((item) => <FieldView key={item.id} sub field={item} answers={answers} set={set} errors={errors} />)}
         </fieldset>
       );
-    }
   }
-}
-
-function SubText({ field, answers, set, error }: { field: TextField; answers: Answers; set: (id: string, value: string) => void; error?: string }) {
-  const id = useId();
-  return (
-    <div className="mt-6">
-      <label htmlFor={id} className="block text-sm font-semibold text-forest">{field.label}{field.required ? " *" : ""}</label>
-      <input id={id} name={field.id} data-field={field.id} type="text" placeholder={field.placeholder} value={asText(answers[field.id])} onChange={(event) => set(field.id, event.target.value)} aria-invalid={error ? true : undefined} className={`${inputBase} mt-3 h-[52px] ${error ? "!border-berry" : ""}`} />
-      {error && <p role="alert" className="mt-2 text-[13px] font-semibold text-berry">{error}</p>}
-    </div>
-  );
 }
 
 function Progress({ labels, current }: { labels: string[]; current: number }) {
@@ -267,6 +300,8 @@ function Progress({ labels, current }: { labels: string[]; current: number }) {
     </div>
   );
 }
+
+const outlineButton = buttonStyles({ variant: "outline", size: "lg", fullWidth: true, className: "text-[15px]" });
 
 export default function ProgramForm({ config }: { config: FormConfig }) {
   const [stage, setStage] = useState(0); // 0..steps-1 fields, steps = review, steps+1 = done
@@ -288,7 +323,7 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
     heading.current?.focus();
   }, [stage]);
 
-  const set = (id: string, value: string | string[]) => {
+  const set: SetValue = (id, value) => {
     setAnswers((prev) => {
       const next = { ...prev, [id]: value };
       // Keep per-selection answers aligned with the chosen options.
@@ -296,15 +331,17 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
       return next;
     });
     setErrors((prev) => {
-      if (!(id in prev) && !Object.keys(prev).some((key) => key.startsWith(`${id}.`))) return prev;
-      const { [id]: _removed, ...rest } = prev;
-      return rest;
+      const keys = Object.keys(prev).filter((key) => key === id || key.startsWith(`${id}.`) || id.startsWith(`${key}.`));
+      if (keys.length === 0) return prev;
+      const next = { ...prev };
+      for (const key of keys) delete next[key];
+      return next;
     });
   };
 
   const stepAt = (index: number): FormStep | undefined => config.steps[index];
-  const allErrors = useMemo(() => config.steps.map((step) => validate(step.fields, answers)), [config.steps, answers]);
-  const missing = allErrors.some((stepErrors) => Object.keys(stepErrors).length > 0);
+  const merged = useMemo(() => Object.assign({}, ...config.steps.map((step) => validate(step.fields, answers))) as Record<string, string>, [config.steps, answers]);
+  const missing = Object.keys(merged).length > 0;
 
   const goNext = () => {
     const step = stepAt(stage);
@@ -313,7 +350,7 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
     setErrors(found);
     const key = Object.keys(found)[0];
     if (key) {
-      const target = document.querySelector<HTMLElement>(`[data-field="${key}"] input, [data-field="${key}"] textarea, [data-field="${key}"]`);
+      const target = document.querySelector<HTMLElement>(`[data-field="${key}"]`);
       target?.scrollIntoView({ block: "center" });
       (target?.matches("input,textarea") ? target : target?.querySelector<HTMLElement>("input,textarea"))?.focus({ preventScroll: true });
       return;
@@ -321,17 +358,20 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
     setStage(stage + 1);
   };
 
-  const filled = (fieldIds: string[], optional?: boolean) => {
-    const fields = config.steps.flatMap((step) => flatten(step.fields)).filter((field) => fieldIds.includes(field.id));
-    const required = fields.filter(isRequired);
-    if (optional || required.length === 0) return fields.some((field) => isAnswered(field, answers) && !(field.type === "radio"));
-    return required.every((field) => isAnswered(field, answers)) && !fields.some((field) => field.type === "perSelection" && asList(answers[field.from]).length >= 2 && !asText(answers[`${field.id}.1`]).trim());
+  const allFields = useMemo(() => config.steps.flatMap((step) => flatten(step.fields)), [config.steps]);
+  const itemState = (item: { fields: string[]; optional?: boolean; static?: string }): string => {
+    if (item.static) return item.static;
+    const fields = allFields.filter((field) => item.fields.includes(field.id) && isVisible(field, answers));
+    const hasError = item.fields.some((id) => Object.keys(merged).some((key) => key === id || key.startsWith(`${id}.`)));
+    const done = item.optional ? fields.some((field) => isAnswered(field, answers)) : !hasError;
+    return done ? "terisi" : "belum diisi";
   };
 
   const head = stage === reviewIndex ? { title: config.review.title as string | [string, string], description: config.review.description } : stage === doneIndex ? { title: config.done.title as string | [string, string], description: config.done.description } : stepAt(stage)!;
   const title = Array.isArray(head.title) ? head.title : [head.title];
-  const prevLabel = stage === 0 ? config.backLabel : `Kembali ke ${labels[stage - 1]}`;
-  const onFooterNote = "Periksa jawaban sebelum melanjutkan. Tombol Kembali mempertahankan isian selama formulir terbuka.";
+  const prevLabel = stage === 0 ? config.startBackLabel ?? config.backLabel : (stage < reviewIndex ? stepAt(stage)!.backLabel : undefined) ?? `Kembali ke ${labels[stage - 1]}`;
+  const footNote = "Periksa jawaban sebelum melanjutkan. Tombol Kembali mempertahankan isian selama formulir terbuka.";
+  const arrow = <ArrowRight size={16} aria-hidden="true" />;
 
   return (
     <main className={`${stage === doneIndex ? "bg-white" : "bg-[#f3faf8]"} pb-12 pt-[33px] tracking-[0.02em] md:pb-20`}>
@@ -349,7 +389,7 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
             <span className="block text-[43px]">{title[0]}</span>
           )}
         </h1>
-        <p className="mt-3 text-base font-semibold leading-6 text-forest">{head.description}</p>
+        <p className="-mr-2.5 mt-3 text-base font-semibold leading-6 text-forest md:mr-0">{head.description}</p>
 
         {stage < doneIndex && <Progress labels={labels} current={stage} />}
         {stage < doneIndex && <p className="mt-8 text-[13px] font-semibold text-forest">Tanda * menunjukkan pertanyaan wajib.</p>}
@@ -360,33 +400,23 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
             <div className="mt-10 flex flex-col gap-3">
               <button type="submit" className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>
                 {stepAt(stage)!.nextLabel ?? "Lanjut"}
-                <ArrowRight size={16} aria-hidden="true" />
+                {arrow}
               </button>
               {stage === 0 ? (
-                <Link to={config.backTo} className={buttonStyles({ variant: "outline", size: "lg", fullWidth: true, className: "text-[15px]" })}>
-                  {prevLabel}
-                  <ArrowRight size={16} aria-hidden="true" />
-                </Link>
+                <Link to={config.backTo} className={outlineButton}>{prevLabel}{arrow}</Link>
               ) : (
-                <button type="button" onClick={() => setStage(stage - 1)} className={buttonStyles({ variant: "outline", size: "lg", fullWidth: true, className: "text-[15px]" })}>
-                  {prevLabel}
-                  <ArrowRight size={16} aria-hidden="true" />
-                </button>
+                <button type="button" onClick={() => setStage(stage - 1)} className={outlineButton}>{prevLabel}{arrow}</button>
               )}
             </div>
-            <p className="mt-4 text-[13px] font-semibold leading-5 text-forest">{onFooterNote}</p>
+            <p className="mt-4 text-[13px] font-semibold leading-5 text-forest">{footNote}</p>
           </form>
         )}
 
         {stage === reviewIndex && (
           <div>
             {missing && (
-              <div role="status" className="mt-6 flex gap-3 rounded-2xl bg-white p-5 text-forest">
-                <Info size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-brand-blue" />
-                <div>
-                  <p className="text-[13px] font-bold">Jawaban belum lengkap</p>
-                  <p className="mt-2 text-[13px] font-semibold leading-5">Masih ada jawaban wajib yang belum diisi. Pilih Ubah jawaban untuk melengkapi sebelum menyelesaikan.</p>
-                </div>
+              <div role="status">
+                <InfoCard title="Jawaban belum lengkap" text="Masih ada jawaban wajib yang belum diisi. Pilih Ubah jawaban untuk melengkapi sebelum menyelesaikan." />
               </div>
             )}
             <div className="mt-6 flex flex-col gap-4">
@@ -396,7 +426,7 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
                   <ul className="mt-4 flex flex-col gap-3 text-[15px] font-semibold leading-6">
                     {section.items.map((item) => (
                       <li key={item.label}>
-                        {item.code ? `${item.code} ` : ""}{item.label}: {filled(item.fields, item.optional) ? "terisi" : "belum diisi"}{item.optional ? " (opsional)" : ""}.
+                        {item.code ? `${item.code} ` : ""}{item.label}: {itemState(item)}{item.optional && !item.static ? " (opsional)" : ""}.
                       </li>
                     ))}
                   </ul>
@@ -415,25 +445,24 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
               >
                 {config.review.finishLabel}
               </button>
-              <button type="button" onClick={() => setStage(stage - 1)} className={buttonStyles({ variant: "outline", size: "lg", fullWidth: true, className: "text-[15px]" })}>
-                {prevLabel}
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
+              <button type="button" onClick={() => setStage(stage - 1)} className={outlineButton}>{prevLabel}{arrow}</button>
             </div>
-            <p className="mt-4 text-[13px] font-semibold leading-5 text-forest">{onFooterNote}</p>
+            <p className="mt-4 text-[13px] font-semibold leading-5 text-forest">{footNote}</p>
           </div>
         )}
 
         {stage === doneIndex && (
-          <div className="mt-8 flex flex-col gap-3 md:max-w-md">
-            <Link to={config.backTo} className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>
-              {config.done.backLabel}
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-            <Link to={config.done.exploreTo} className={buttonStyles({ variant: "outline", size: "lg", fullWidth: true, className: "text-[15px]" })}>
-              {config.done.exploreLabel}
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
+          <div className="mt-8 md:max-w-md">
+            {config.done.card && (
+              <div className="mb-8 rounded-2xl bg-[#f3faf8] p-5 text-forest">
+                <p className="font-display text-[26px] font-bold leading-[1.15] tracking-normal">{config.done.card.title}</p>
+                <p className="mt-4 text-base font-semibold leading-6">{config.done.card.text}</p>
+              </div>
+            )}
+            <div className="flex flex-col gap-3">
+              <Link to={config.backTo} className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>{config.done.backLabel}{arrow}</Link>
+              <Link to={config.done.exploreTo} className={outlineButton}>{config.done.exploreLabel}{arrow}</Link>
+            </div>
           </div>
         )}
       </PageContainer>
