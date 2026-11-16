@@ -13,9 +13,16 @@ Berhenti karena batas kuota: halaman pertama memakai ±53% limit 5 jam (sudah te
 Tombol CTA tiap program menuju `/apply/growthx/form`, `/apply/growthconnect/form`, `/learn/growthcamp/form` (Coming Soon sampai form dibangun).
 Cek lolos tiap halaman: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/routes.mjs`. Audit posisi vertikal vs PDF: selisih rata-rata GrowthX -0,5px, GrowthConnect +21px, GrowthCamp +43px (terburuk ±100-140px dari 7-9k px).
 
+## Form (mesin berbasis konfigurasi)
+
+- Mesin: `src/components/form/ProgramForm.tsx` + tipe `src/components/form/types.ts` (field text/radio/textarea+hitung kata/checkboxes dengan batas/perSelection/consent/group, validasi per langkah, review otomatis, layar "Simulasi Selesai"). Jawaban hanya di state, tidak dikirim/disimpan.
+- GrowthX: `src/data/forms/growthx-form.ts` di route `/apply/growthx/form` (5 langkah). Uji alur: `node docs/qa/form-flow.mjs <baseUrl>` (15 cek).
+- Form GrowthConnect dan GrowthCamp tinggal membuat file konfigurasi serupa dari frame PDF-nya (`c_f1..c_f6`, `l_c..l_h`) dan memasangnya di `App.tsx`.
+- Keputusan default: varian WhatsApp pada kolom kontak (label "Nomor WhatsApp aktif", placeholder contoh) dan kata "terisi" pada daftar review ditulis sendiri (Figma hanya menunjukkan keadaan kosong). Tombol "Selesaikan Simulasi" nonaktif selama masih ada jawaban wajib kosong.
+
 ## Belum
 
-1. Form multi-langkah per program (GrowthX 6 layar, GrowthConnect 6, GrowthCamp 7: kontak, isian, review, "Simulasi Selesai"). Rencana: satu mesin form berbasis konfigurasi.
+1. Form GrowthConnect dan GrowthCamp (konfigurasi saja).
 2. Halaman Learn terbaru (`/learn`; frame ke-1 `l_a` di `2. PAGE LEARN.pdf`, perlu diekstrak ulang dengan tinggi ±4500).
 3. Login/Loading, dialog.
 

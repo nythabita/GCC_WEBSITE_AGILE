@@ -13,6 +13,8 @@ import ProgramsPage from "./pages/ProgramsPage";
 import GrowthXPage from "./pages/GrowthXPage";
 import GrowthConnectPage from "./pages/GrowthConnectPage";
 import GrowthCampPage from "./pages/GrowthCampPage";
+import ProgramForm from "./components/form/ProgramForm";
+import { growthxForm } from "./data/forms/growthx-form";
 import { homepageDraft } from "./data/homepage-draft";
 
 // Scroll to the hash target after client-side navigation (e.g. the drawer's "/#programs" link).
@@ -46,7 +48,7 @@ export default function App() {
         <Route path="/learn/growthcamp" element={<GrowthCampPage />} />
         <Route path="/learn/growthcamp/form" element={<PreviewPage title="Formulir GrowthCamp" description="Formulir pendaftaran GrowthCamp sedang disiapkan." />} />
         <Route path="/apply/growthx" element={<GrowthXPage />} />
-        <Route path="/apply/growthx/form" element={<PreviewPage title="Formulir GrowthX" description="Formulir minat GrowthX sedang disiapkan." />} />
+        <Route path="/apply/growthx/form" element={<ProgramForm config={growthxForm} />} />
         <Route path="/apply/growthconnect" element={<GrowthConnectPage />} />
         <Route path="/apply/growthconnect/form" element={<PreviewPage title="Formulir GrowthConnect" description="Formulir pengajuan GrowthConnect sedang disiapkan." />} />
         <Route path="/login" element={<PreviewPage title="Login" description="Akses akun anggota sedang disiapkan." />} />
