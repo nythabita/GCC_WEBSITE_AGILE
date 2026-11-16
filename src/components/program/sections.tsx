@@ -52,10 +52,10 @@ export function ProgramHero({ eyebrow, name, logo, logoAlt, logoWidth = 91, titl
     <section aria-labelledby="program-title" className="pb-3 pt-[29px] md:pb-16">
       <PageContainer>
         <BackLink to={backTo}>Kembali ke Program</BackLink>
-        <div className="mt-10 md:grid md:grid-cols-2 md:items-center md:gap-12">
+        <div className={`${eyebrow ? "mt-6" : "mt-10"} md:grid md:grid-cols-2 md:items-center md:gap-12`}>
           <div>
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            <div className={`${eyebrow ? "mt-4" : ""} flex items-center justify-between gap-3`}>
+            <div className={`${eyebrow ? "mt-4" : ""} flex flex-wrap items-center justify-between gap-x-3 gap-y-2`}>
               <p className="tracking-normal font-brand text-[34px] leading-none text-forest">{name}</p>
               {logo && <img src={logo} alt={logoAlt ?? ""} style={{ width: logoWidth }} className="shrink-0" />}
             </div>
@@ -83,16 +83,16 @@ export function ProgramHero({ eyebrow, name, logo, logoAlt, logoWidth = 91, titl
 export type CardTone = "white" | "glass";
 
 // White rounded cards: used on gradient, green and berry backgrounds alike.
-export function CardStack({ items, compact = false, className = "", icons }: { items: CardItem[]; compact?: boolean; className?: string; icons?: ReactNode[] }) {
+export function CardStack({ items, compact = false, serif = false, className = "", icons }: { items: CardItem[]; compact?: boolean; serif?: boolean; className?: string; icons?: ReactNode[] }) {
   return (
     <ul className={`flex flex-col gap-4 md:grid md:grid-cols-3 ${className}`}>
       {items.map((item, index) => (
         <li key={item.title} className={`rounded-2xl bg-white px-5 text-forest ${compact ? "py-[18px]" : "py-[18px]"}`}>
           <div className="flex items-center gap-4">
             {icons?.[index]}
-            <h3 className={`font-ui font-semibold leading-tight ${compact ? "text-[15px] font-bold" : "text-[17px]"}`}>{item.title}</h3>
+            <h3 className={serif ? "tracking-normal font-display text-[22px] font-bold leading-tight" : `font-ui font-semibold leading-tight ${compact ? "text-[15px] font-bold" : "text-[17px]"}`}>{item.title}</h3>
           </div>
-          <p className={`font-semibold ${compact ? "mt-2.5 text-[15px] leading-[23px]" : "mt-3 text-base leading-6"}`}>{item.text}</p>
+          <p className={`-mr-3.5 font-semibold md:mr-0 ${compact ? "mt-2.5 text-[15px] leading-[23px]" : "mt-3 text-base leading-6"}`}>{item.text}</p>
         </li>
       ))}
     </ul>
@@ -104,14 +104,14 @@ export function Note({ children, tone = "dark", className = "" }: { children: Re
 }
 
 // "ASPEK 01" style numbered text blocks on a white background.
-export function LabeledList({ label, items, serifTitle = true }: { label: string; items: CardItem[]; serifTitle?: boolean }) {
+export function LabeledList({ label, items, serifTitle = true, gap = "gap-14" }: { label: string; items: CardItem[]; serifTitle?: boolean; gap?: string }) {
   return (
-    <ol className="flex flex-col gap-14 px-5 md:grid md:grid-cols-2 md:px-0">
+    <ol className={`flex flex-col ${gap} px-5 md:grid md:grid-cols-2 md:px-0`}>
       {items.map((item, index) => (
         <li key={item.title}>
           <p className="font-ui text-[11px] font-bold uppercase text-forest">{label} {String(index + 1).padStart(2, "0")}</p>
-          <h3 className={`mt-3 tracking-normal text-[24px] leading-tight text-forest ${serifTitle ? "font-display font-bold" : "font-sub font-semibold"}`}>{item.title}</h3>
-          <p className="mt-6 text-base font-semibold leading-6 text-forest">{item.text}</p>
+          <h3 className={`mt-3 tracking-normal text-[22px] leading-tight text-forest ${serifTitle ? "font-display font-bold" : "font-sub font-semibold"}`}>{item.title}</h3>
+          <p className="-mr-5 mt-6 text-base font-semibold leading-6 text-forest md:mr-0">{item.text}</p>
         </li>
       ))}
     </ol>
@@ -145,7 +145,7 @@ export function CheckList({ items, className = "" }: { items: (string | CardItem
 
 export function Timeline({ steps }: { steps: Step[] }) {
   return (
-    <ol className="relative flex max-w-xl flex-col gap-8">
+    <ol className="relative flex max-w-xl flex-col gap-7">
       <span aria-hidden="true" className="absolute bottom-6 left-5 top-6 w-px bg-sage" />
       {steps.map((step) => (
         <li key={step.title} className="relative flex items-start gap-4">
@@ -171,15 +171,15 @@ export function Polaroid({ src, alt, caption }: { src: string; alt: string; capt
 
 export type CaseData = { badge: string; name: string; question: string; focus: string; disclaimer: string; cta: Cta };
 
-export function CaseCard({ data, icon }: { data: CaseData; icon: string }) {
+export function CaseCard({ data, icon, soft = false }: { data: CaseData; icon?: string; soft?: boolean }) {
   return (
     <div className="mt-6 rounded-3xl bg-white p-5 md:max-w-2xl">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="inline-block rounded-md bg-sun px-2.5 py-1 text-[11px] font-bold uppercase text-black">{data.badge}</span>
+          <span className={`inline-block rounded-md px-2.5 py-1 text-[11px] font-bold uppercase ${soft ? "bg-[#fdebd0] text-berry" : "bg-sun text-black"}`}>{data.badge}</span>
           <h3 className="mt-4 tracking-normal font-display text-[22px] font-bold text-forest">{data.name}</h3>
         </div>
-        <img src={icon} alt="" aria-hidden="true" className="w-[69px] shrink-0" />
+        {icon && <img src={icon} alt="" aria-hidden="true" className="w-[69px] shrink-0" />}
       </div>
       <p className="mt-4 text-base font-bold leading-6 text-forest">{data.question}</p>
       <p className="mt-4 text-[15px] font-bold leading-6 text-forest">{data.focus}</p>
