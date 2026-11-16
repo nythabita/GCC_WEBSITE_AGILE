@@ -5,7 +5,7 @@ import { chromium } from "playwright-core";
 const base = process.argv[2] ?? "http://localhost:5173";
 const ROUTES = [
   "/", "/discover", "/about", "/assessment", "/pilih-program", "/programs",
-  "/learn", "/learn/growthcamp", "/apply", "/apply/growthx", "/apply/growthx/form", "/apply/growthconnect", "/apply/growthconnect/form",
+  "/learn", "/learn/growthcamp", "/learn/growthcamp/form", "/apply", "/apply/growthx", "/apply/growthx/form", "/apply/growthconnect", "/apply/growthconnect/form",
   "/grow", "/login", "/xyz",
 ];
 

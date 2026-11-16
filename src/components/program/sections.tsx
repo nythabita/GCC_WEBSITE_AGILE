@@ -36,7 +36,7 @@ export function SectionHead({ eyebrow, title, description, tone = "dark", id, de
   );
 }
 
-export function ProgramHero({ eyebrow, name, logo, logoAlt, logoWidth = 91, title, description, cta, backTo, photo }: {
+export function ProgramHero({ eyebrow, name, logo, logoAlt, logoWidth = 91, title, description, cta, backTo, backLabel = "Kembali ke Program", photo }: {
   eyebrow?: string;
   name: string;
   logo?: string;
@@ -46,30 +46,31 @@ export function ProgramHero({ eyebrow, name, logo, logoAlt, logoWidth = 91, titl
   description: string;
   cta: Cta;
   backTo: string;
-  photo?: { src: string; alt: string; caption: string };
+  backLabel?: string;
+  photo?: { src: string; alt: string; caption: string; wide?: boolean };
 }) {
   return (
     <section aria-labelledby="program-title" className="pb-3 pt-[29px] md:pb-16">
       <PageContainer>
-        <BackLink to={backTo}>Kembali ke Program</BackLink>
+        <BackLink to={backTo}>{backLabel}</BackLink>
         <div className={`${eyebrow ? "mt-6" : "mt-10"} md:grid md:grid-cols-2 md:items-center md:gap-12`}>
           <div>
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            <div className={`${eyebrow ? "mt-4" : ""} flex flex-wrap items-center justify-between gap-x-3 gap-y-2`}>
-              <p className="tracking-normal font-brand text-[34px] leading-none text-forest">{name}</p>
-              {logo && <img src={logo} alt={logoAlt ?? ""} style={{ width: logoWidth }} className="shrink-0" />}
+            <div className={`${eyebrow ? "mt-4" : ""} flex flex-wrap items-start justify-between gap-x-3 gap-y-2`}>
+              <p className="tracking-normal font-brand text-[30px] leading-none text-forest">{name}</p>
+              {logo && <span className="block h-9 shrink-0"><img src={logo} alt={logoAlt ?? ""} style={{ width: logoWidth }} className="block max-w-none" /></span>}
             </div>
             <h1 id="program-title" className="mt-4 tracking-normal font-display font-bold italic text-forest">
               <span className="block text-[31px] leading-[1.25] md:text-4xl">{title[0]}</span>
               <span className="block text-[43px] leading-[1.1] md:text-[56px]">{title[1]}</span>
             </h1>
-            <p className="-mr-2.5 mt-3 text-base font-bold leading-6 text-forest md:mr-0 md:text-lg">{description}</p>
+            <p className="-mr-5 mt-3 text-base font-semibold leading-6 text-forest md:mr-0 md:text-lg">{description}</p>
             <ArrowLink to={cta.to} variant="berry" className="mt-6 md:w-auto">{cta.label}</ArrowLink>
           </div>
           {photo && (
-            <figure className="mx-auto mt-8 max-w-[273px] md:mt-0">
-              <div className="bg-white p-2 pb-2 shadow-lg">
-                <img src={photo.src} alt={photo.alt} className="block aspect-[4/3] w-full object-cover" />
+            <figure className={`mx-auto mt-8 md:mt-0 ${photo.wide ? "max-w-[342px]" : "max-w-[273px]"}`}>
+              <div className={`bg-white shadow-lg ${photo.wide ? "p-4" : "p-2"}`}>
+                <img src={photo.src} alt={photo.alt} className={`block w-full object-cover ${photo.wide ? "aspect-video" : "aspect-[4/3]"}`} />
               </div>
               <figcaption className="mt-2 text-center font-display text-xl font-bold text-black">{photo.caption}</figcaption>
             </figure>
@@ -83,7 +84,7 @@ export function ProgramHero({ eyebrow, name, logo, logoAlt, logoWidth = 91, titl
 export type CardTone = "white" | "glass";
 
 // White rounded cards: used on gradient, green and berry backgrounds alike.
-export function CardStack({ items, compact = false, serif = false, className = "", icons }: { items: CardItem[]; compact?: boolean; serif?: boolean; className?: string; icons?: ReactNode[] }) {
+export function CardStack({ items, compact = false, serif = false, small = false, className = "", icons }: { items: CardItem[]; compact?: boolean; serif?: boolean; small?: boolean; className?: string; icons?: ReactNode[] }) {
   return (
     <ul className={`flex flex-col gap-4 md:grid md:grid-cols-3 ${className}`}>
       {items.map((item, index) => (
@@ -92,7 +93,7 @@ export function CardStack({ items, compact = false, serif = false, className = "
             {icons?.[index]}
             <h3 className={serif ? "tracking-normal font-display text-[22px] font-bold leading-tight" : `font-ui font-semibold leading-tight ${compact ? "text-[15px] font-bold" : "text-[17px]"}`}>{item.title}</h3>
           </div>
-          <p className={`-mr-3.5 font-semibold md:mr-0 ${compact ? "mt-2.5 text-[15px] leading-[23px]" : "mt-3 text-base leading-6"}`}>{item.text}</p>
+          <p className={`-mr-3.5 font-semibold md:mr-0 ${compact ? "mt-2.5 text-[15px] leading-[23px]" : small ? "mt-3 text-[15px] leading-6" : "mt-3 text-base leading-6"}`}>{item.text}</p>
         </li>
       ))}
     </ul>
@@ -104,7 +105,9 @@ export function Note({ children, tone = "dark", className = "" }: { children: Re
 }
 
 // "ASPEK 01" style numbered text blocks on a white background.
-export function LabeledList({ label, items, serifTitle = true, gap = "gap-14" }: { label: string; items: CardItem[]; serifTitle?: boolean; gap?: string }) {
+export type LabeledItem = CardItem & { extra?: { label: string; text: string } };
+
+export function LabeledList({ label, items, serifTitle = true, gap = "gap-14" }: { label: string; items: LabeledItem[]; serifTitle?: boolean; gap?: string }) {
   return (
     <ol className={`flex flex-col ${gap} px-5 md:grid md:grid-cols-2 md:px-0`}>
       {items.map((item, index) => (
@@ -112,28 +115,34 @@ export function LabeledList({ label, items, serifTitle = true, gap = "gap-14" }:
           <p className="font-ui text-[11px] font-bold uppercase text-forest">{label} {String(index + 1).padStart(2, "0")}</p>
           <h3 className={`mt-3 tracking-normal text-[22px] leading-tight text-forest ${serifTitle ? "font-display font-bold" : "font-sub font-semibold"}`}>{item.title}</h3>
           <p className="-mr-5 mt-6 text-base font-semibold leading-6 text-forest md:mr-0">{item.text}</p>
+          {item.extra && (
+            <>
+              <p className="mt-6 text-sm font-semibold text-forest">{item.extra.label}</p>
+              <p className="mt-2 text-[15px] font-semibold leading-6 text-forest">{item.extra.text}</p>
+            </>
+          )}
         </li>
       ))}
     </ol>
   );
 }
 
-export function CheckList({ items, className = "" }: { items: (string | CardItem)[]; className?: string }) {
+export function CheckList({ items, className = "", tone = "dark" }: { items: (string | CardItem)[]; className?: string; tone?: "dark" | "light" }) {
   return (
     <ul className={`flex flex-col gap-6 ${className}`}>
       {items.map((item) => {
         const entry = typeof item === "string" ? { title: item, text: "" } : item;
         return (
           <li key={entry.title} className="flex items-start gap-3">
-            <Check size={16} aria-hidden="true" className="mt-1 shrink-0 text-teal-deep" />
+            <Check size={16} aria-hidden="true" className={`mt-1 shrink-0 ${tone === "light" ? "text-white" : "text-teal-deep"}`} />
             <div>
               {entry.text ? (
                 <>
-                  <h3 className="text-base font-bold leading-6 text-forest">{entry.title}</h3>
-                  <p className="mt-2 text-[15px] font-semibold leading-6 text-forest/80">{entry.text}</p>
+                  <h3 className={`text-base font-bold leading-6 ${tone === "light" ? "text-white" : "text-forest"}`}>{entry.title}</h3>
+                  <p className={`mt-2 text-[15px] font-semibold leading-6 ${tone === "light" ? "text-white" : "text-forest/80"}`}>{entry.text}</p>
                 </>
               ) : (
-                <p className="text-base font-bold leading-6 text-forest">{entry.title}</p>
+                <p className={`text-base font-bold leading-6 ${tone === "light" ? "text-white" : "text-forest"}`}>{entry.title}</p>
               )}
             </div>
           </li>
@@ -160,10 +169,10 @@ export function Timeline({ steps }: { steps: Step[] }) {
   );
 }
 
-export function Polaroid({ src, alt, caption }: { src: string; alt: string; caption: string }) {
+export function Polaroid({ src, alt, caption, wide = false }: { src: string; alt: string; caption: string; wide?: boolean }) {
   return (
-    <figure className="mx-auto mt-6 max-w-[246px] md:max-w-[320px]">
-      <img src={src} alt={alt} className="block aspect-[4/3] w-full object-cover" />
+    <figure className={`mx-auto mt-6 md:max-w-[320px] ${wide ? "max-w-[342px] bg-white p-4" : "max-w-[246px]"}`}>
+      <img src={src} alt={alt} className={`block w-full object-cover ${wide ? "aspect-video" : "aspect-[4/3]"}`} />
       <figcaption className="mt-3 text-center font-display text-xl font-bold text-black">{caption}</figcaption>
     </figure>
   );

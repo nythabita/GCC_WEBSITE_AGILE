@@ -31,7 +31,7 @@ export default function GrowthXPage() {
         <section aria-labelledby="gx-about" className="pb-0 pt-6 md:pb-20">
           <PageContainer>
             <SectionHead id="gx-about" eyebrow={growthxAbout.eyebrow} title={growthxAbout.title} description={growthxAbout.description} />
-            <CardStack items={growthxAbout.cards} className="mt-6" />
+            <CardStack small items={growthxAbout.cards} className="mt-6" />
             <Note className="mt-6">{growthxAbout.note}</Note>
           </PageContainer>
         </section>
