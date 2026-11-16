@@ -152,13 +152,13 @@ export function CheckList({ items, className = "", tone = "dark" }: { items: (st
   );
 }
 
-export function Timeline({ steps }: { steps: Step[] }) {
+export function Timeline({ steps, bright = false }: { steps: Step[]; bright?: boolean }) {
   return (
     <ol className="relative flex max-w-xl flex-col gap-7">
       <span aria-hidden="true" className="absolute bottom-6 left-5 top-6 w-px bg-sage" />
       {steps.map((step) => (
-        <li key={step.title} className="relative flex items-start gap-4">
-          <StepBadge number={step.number} tone={step.tone === "rose" ? "rose" : "teal"} className={step.tone === "rose" ? "" : "!bg-teal-deep"} />
+        <li key={step.title} className="relative flex min-h-[85px] items-start gap-4">
+          <StepBadge number={step.number} tone={step.tone === "rose" ? "rose" : "teal"} className={step.tone === "rose" ? "" : bright ? "" : "!bg-teal-deep"} />
           <div className="pt-0.5">
             <h3 className="font-ui text-[17px] font-bold leading-tight text-forest">{step.title}</h3>
             <p className="mt-2 text-[15px] font-semibold leading-6 text-forest/80">{step.description}</p>
@@ -169,11 +169,13 @@ export function Timeline({ steps }: { steps: Step[] }) {
   );
 }
 
-export function Polaroid({ src, alt, caption, wide = false }: { src: string; alt: string; caption: string; wide?: boolean }) {
+export function Polaroid({ src, alt, caption, wide = false, frame = "bg-white" }: { src: string; alt: string; caption: string; wide?: boolean; frame?: string }) {
   return (
-    <figure className={`mx-auto mt-6 md:max-w-[320px] ${wide ? "max-w-[342px] bg-white p-4" : "max-w-[246px]"}`}>
-      <img src={src} alt={alt} className={`block w-full object-cover ${wide ? "aspect-video" : "aspect-[4/3]"}`} />
-      <figcaption className="mt-3 text-center font-display text-xl font-bold text-black">{caption}</figcaption>
+    <figure className={`mx-auto mt-6 md:max-w-[320px] ${wide ? "max-w-[342px]" : "max-w-[246px]"}`}>
+      <div className={wide ? `px-6 pb-3 pt-3 ${frame}` : ""}>
+        <img src={src} alt={alt} className={`block w-full object-cover ${wide ? "aspect-video" : "aspect-[4/3]"}`} />
+      </div>
+      <figcaption className="mt-3 text-center font-display text-xl font-bold tracking-normal text-black">{caption}</figcaption>
     </figure>
   );
 }
@@ -199,13 +201,13 @@ export function CaseCard({ data, icon, soft = false }: { data: CaseData; icon?: 
 }
 
 // FAQ on the mint gradient; the closing card (children) sits on the lighter end of the same gradient.
-export function FaqSection({ id, title, items, label, children }: { id: string; title: string; items: FaqItem[]; label: string; children?: ReactNode }) {
+export function FaqSection({ id, title, items, label, children, eyebrow = "Pertanyaan umum" }: { id: string; title: string; items: FaqItem[]; label: string; children?: ReactNode; eyebrow?: string }) {
   return (
     <div className="bg-[linear-gradient(to_bottom,#62d8ba,#a7e9d8_55%,#f3fcfa_80%)]">
       <section aria-labelledby={id} className="pb-14 pt-10 md:pb-20">
         <PageContainer>
-          <Eyebrow className="!text-white">Pertanyaan umum</Eyebrow>
-          <h2 id={id} className="mt-5 tracking-normal font-display text-[37px] font-bold italic leading-[1.15] text-white md:text-[42px]">{title}</h2>
+          {eyebrow && <Eyebrow className="!text-white">{eyebrow}</Eyebrow>}
+          <h2 id={id} className={`${eyebrow ? "mt-5" : ""} tracking-normal font-display text-[37px] font-bold italic leading-[1.15] text-white md:text-[42px]`}>{title}</h2>
           <div className="mt-6 md:max-w-2xl"><FaqList label={label} items={items} tone="glass" /></div>
         </PageContainer>
       </section>

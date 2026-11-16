@@ -1,110 +1,88 @@
-import { Check, BookOpen, MessageSquareText, Target } from "lucide-react";
+import { BookOpen, MessageSquareText, Target } from "lucide-react";
 import { Link } from "react-router";
-import { growthCamp } from "../assets/brand";
-import { ArrowLink, ClosingCta, DisplayTitle, Eyebrow, FaqList, PageContainer, PhotoFrame, StepTimeline } from "../components/content/blocks";
-import { competencies, featuredGrowthCamp, learnClosing, learnFaq, learnHero, learningToPractice } from "../data/learn-content";
+import { logoGrowthCampMini } from "../assets/home";
+import { ArrowLink, Eyebrow, PageContainer } from "../components/content/blocks";
+import { BerryClosing, CardStack, CheckList, FaqSection, Note, Polaroid, SectionHead, Timeline } from "../components/program/sections";
+import { competencies, featuredGrowthCamp as camp, learnClosing, learnFaq, learnHero as hero, learningToPractice as practice } from "../data/learn-content";
 
-const competencyIcons = {
-  book: <BookOpen size={22} aria-hidden="true" className="text-brand-red" />,
-  target: <Target size={22} aria-hidden="true" className="text-teal-deep" />,
-  chat: <MessageSquareText size={22} aria-hidden="true" className="text-brand-blue" />,
-};
+const competencyIcons = [
+  <BookOpen key="book" size={22} aria-hidden="true" className="text-brand-blue" />,
+  <Target key="target" size={22} aria-hidden="true" className="text-teal-deep" />,
+  <MessageSquareText key="chat" size={22} aria-hidden="true" className="text-brand-blue" />,
+];
 
+// "2. PAGE LEARN" (frame 1) — /learn.
 export default function LearnPage() {
   return (
-    <main className="bg-paper text-forest">
-      <PageContainer className="pt-10 md:pt-16">
-        <section aria-labelledby="learn-title" className="md:grid md:grid-cols-2 md:items-center md:gap-12">
-          <div>
-            <Eyebrow>{learnHero.eyebrow}</Eyebrow>
-            <DisplayTitle as="h1" className="mt-5">
-              {learnHero.title.map((line) => <span key={line} className="block">{line}</span>)}
-            </DisplayTitle>
-            <p className="mt-6 text-base leading-snug md:text-lg">{learnHero.description}</p>
-            <ArrowLink to={learnHero.cta.to} className="mt-8 md:w-auto" fullWidth>{learnHero.cta.label}</ArrowLink>
-            <Link to={learnHero.secondary.to} className="mt-4 inline-block text-sm font-semibold text-brand-blue underline underline-offset-4">{learnHero.secondary.label}</Link>
-          </div>
-          <PhotoFrame {...learnHero.photo} className="mt-9 md:mt-0" />
+    <main className="tracking-[0.02em]">
+      <div className="bg-[linear-gradient(to_bottom,#fbfefd,#cff3ea_40%,#b9eddf)]">
+        <section aria-labelledby="learn-title" className="pb-0 pt-10 md:pt-16">
+          <PageContainer>
+            <div className="md:grid md:grid-cols-2 md:items-center md:gap-12">
+              <div>
+                <Eyebrow>{hero.eyebrow}</Eyebrow>
+                <h1 id="learn-title" className="mt-4 font-display font-bold italic tracking-normal text-forest">
+                  <span className="block text-[31px] leading-[1.25] md:text-4xl">{hero.title[0]}</span>
+                  <span className="block text-[43px] leading-[1.1] md:text-[56px]">{hero.title[1]}</span>
+                </h1>
+                <p className="-mr-5 mt-2 text-base font-semibold leading-6 text-forest md:mr-0 md:text-lg">{hero.description}</p>
+                <ArrowLink to={hero.cta.to} variant="berry" className="mt-7 md:w-auto">{hero.cta.label}</ArrowLink>
+                <Link to={hero.secondary.to} className="mt-4 inline-block text-sm font-semibold text-teal-deep underline underline-offset-4">{hero.secondary.label}</Link>
+              </div>
+              <Polaroid wide src={hero.photo.src} alt={hero.photo.alt} caption={hero.photo.caption} />
+            </div>
+          </PageContainer>
         </section>
 
-        <section aria-labelledby="competencies-title" className="mt-12 md:mt-24">
-          <Eyebrow>{competencies.eyebrow}</Eyebrow>
-          <DisplayTitle className="mt-4"><span id="competencies-title">{competencies.title}</span></DisplayTitle>
-          <p className="mt-5 text-base leading-snug md:text-lg">{competencies.description}</p>
-          <ul className="mt-8 flex flex-col gap-4 md:grid md:grid-cols-3">
-            {competencies.items.map((item) => (
-              <li key={item.name} className={`rounded-2xl p-4 ${item.tone === "mint" ? "bg-mint" : "border border-line/60 bg-paper-soft"}`}>
-                <div className="flex items-center gap-4">
-                  {competencyIcons[item.icon]}
-                  <h3 className="font-sub text-[17px] font-semibold">{item.number} {item.name}</h3>
-                </div>
-                <p className="mt-4 text-base leading-snug">{item.description}</p>
-              </li>
-            ))}
-          </ul>
+        <section aria-labelledby="learn-skills" className="pb-12 pt-4 md:pb-20">
+          <PageContainer>
+            <SectionHead id="learn-skills" eyebrow={competencies.eyebrow} title={competencies.title} description={competencies.description} />
+            <CardStack small items={competencies.items} icons={competencyIcons} className="mt-8" />
+          </PageContainer>
         </section>
-      </PageContainer>
+      </div>
 
-      <section aria-labelledby="featured-title" className="mt-12 bg-paper-warm py-6 md:mt-24 md:py-16">
+      <section aria-labelledby="learn-camp" className="bg-white pb-2 pt-[76px] md:py-20">
         <PageContainer>
-          <Eyebrow>{featuredGrowthCamp.eyebrow}</Eyebrow>
-          <div className="mt-4 flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h2 id="featured-title" className="font-brand text-[32px] leading-none">{featuredGrowthCamp.name}</h2>
-              <p className="mt-4 font-sub text-xl font-semibold leading-tight md:text-2xl">
-                {featuredGrowthCamp.tagline.map((line) => <span key={line} className="block">{line}</span>)}
+              <h2 id="learn-camp" className="font-brand text-[30px] leading-none tracking-normal text-berry">{camp.name}</h2>
+              <p className="mt-5 font-display text-[22px] font-bold leading-[1.3] tracking-normal text-forest">
+                {camp.tagline.map((line) => <span key={line} className="block">{line}</span>)}
               </p>
             </div>
-            {/* The source PNG has wide empty margins; crop them with an overflow box instead of scaling the layout. */}
-            <div className="mt-2 h-[60px] w-[90px] shrink-0 overflow-hidden opacity-80" aria-hidden="true">
-              <img src={growthCamp} alt="" className="block w-[131px] max-w-none -translate-x-[21px] -translate-y-[53px]" />
-            </div>
+            <img src={logoGrowthCampMini} alt="" aria-hidden="true" className="w-[89px] shrink-0" />
           </div>
-          <p className="mt-7 text-base leading-snug md:max-w-2xl md:text-lg">{featuredGrowthCamp.description}</p>
-          <PhotoFrame {...featuredGrowthCamp.photo} className="mt-6 md:max-w-xl" />
-          <dl className="mt-6 flex flex-col gap-4">
-            {featuredGrowthCamp.facts.map((fact) => (
+          <p className="-mr-2.5 mt-6 text-base font-bold leading-6 text-forest md:mr-0 md:max-w-2xl md:text-lg">{camp.description}</p>
+          <Polaroid wide frame="bg-[#fbf6ee]" src={camp.photo.src} alt={camp.photo.alt} caption={camp.photo.caption} />
+          <dl className="mt-6 flex flex-col gap-3">
+            {camp.facts.map((fact) => (
               <div key={fact.label}>
-                <dt className="font-sub text-base font-semibold">{fact.label}</dt>
-                <dd className="mt-1 text-base leading-snug text-forest/80">{fact.value}</dd>
+                <dt className="text-base font-semibold text-forest">{fact.label}</dt>
+                <dd className="-mr-3 mt-1 text-base font-semibold leading-6 text-forest/80">{fact.value}</dd>
               </div>
             ))}
           </dl>
-          <h3 className="mt-8 font-sub text-xl font-semibold">{featuredGrowthCamp.overviewTitle}</h3>
-          <ul className="mt-4 flex flex-col gap-2.5 md:grid md:grid-cols-2">
-            {featuredGrowthCamp.overview.map((item) => (
-              <li key={item} className="flex min-h-[60px] items-center gap-4 rounded-2xl bg-white px-5 text-sm font-semibold">
-                <Check size={16} aria-hidden="true" className="text-teal-active" />
-                {item}
-              </li>
-            ))}
-          </ul>
-          <ArrowLink to={featuredGrowthCamp.cta.to} className="mt-5 md:w-auto">{featuredGrowthCamp.cta.label}</ArrowLink>
-          <p className="mt-4 text-xs text-forest/80">{featuredGrowthCamp.note}</p>
+          <h3 className="mt-6 text-[18px] font-semibold leading-6 text-forest">{camp.overviewTitle}</h3>
+          <CheckList items={camp.overview} className="mt-6 !gap-[46px] md:max-w-xl" />
+          <ArrowLink to={camp.cta.to} variant="berry" className="mt-8 md:w-auto">{camp.cta.label}</ArrowLink>
+          <Note className="mt-5">{camp.note}</Note>
         </PageContainer>
       </section>
 
-      <PageContainer>
-        <section aria-labelledby="practice-title" className="mt-12 md:mt-24">
-          <DisplayTitle>
-            <span id="practice-title">{learningToPractice.title.map((line) => <span key={line} className="block">{line}</span>)}</span>
-          </DisplayTitle>
-          <p className="mt-5 text-base leading-snug md:text-lg">{learningToPractice.description}</p>
-          <div className="mt-8 md:max-w-xl"><StepTimeline steps={learningToPractice.steps} /></div>
-          <p className="mt-10 text-sm text-forest/80">{learningToPractice.note}</p>
-          <ArrowLink to={learningToPractice.cta.to} variant="outline" className="mt-4 border-brand-blue text-brand-blue md:w-auto">{learningToPractice.cta.label}</ArrowLink>
-        </section>
+      <div aria-hidden="true" className="h-9 bg-[#5fd6b8]" />
+      <section aria-labelledby="learn-practice" className="bg-white pb-8 pt-4 md:py-20">
+        <PageContainer>
+          <SectionHead id="learn-practice" title={practice.title} description={practice.description} />
+          <div className="mt-8"><Timeline bright steps={practice.steps} /></div>
+          <Note className="mt-8">{practice.note}</Note>
+          <ArrowLink to={practice.cta.to} variant="outline" className="mt-5 md:w-auto">{practice.cta.label}</ArrowLink>
+        </PageContainer>
+      </section>
 
-        <section aria-labelledby="faq-title" className="mt-14 md:mt-24">
-          <Eyebrow>{learnFaq.eyebrow}</Eyebrow>
-          <DisplayTitle className="mt-4"><span id="faq-title">{learnFaq.title}</span></DisplayTitle>
-          <div className="mt-8 md:max-w-2xl"><FaqList label="Pertanyaan umum" items={learnFaq.items} /></div>
-        </section>
-
-        <div className="mt-12 pb-10 md:mt-24 md:pb-24">
-          <ClosingCta title={learnClosing.title.map((line) => <span key={line} className="block">{line}</span>)} description={learnClosing.description} cta={learnClosing.cta} />
-        </div>
-      </PageContainer>
+      <FaqSection id="learn-faq" eyebrow="" title={learnFaq.title} items={learnFaq.items} label="Pertanyaan umum Learn">
+        <BerryClosing id="learn-closing" title={learnClosing.title} description={learnClosing.description} cta={learnClosing.cta} />
+      </FaqSection>
     </main>
   );
 }

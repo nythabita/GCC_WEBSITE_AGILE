@@ -21,11 +21,17 @@ Cek lolos tiap halaman: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/r
 - Keputusan default: varian WhatsApp pada kolom kontak (label "Nomor WhatsApp aktif" + placeholder contoh) dan kata "terisi" pada daftar review ditulis sendiri (Figma hanya menunjukkan keadaan kosong). Tombol "Selesaikan Simulasi" nonaktif selama ada jawaban wajib kosong. Di GrowthConnect, kolom "Kisaran anggaran" baru tampil setelah memilih "Memiliki kisaran" (di Figma terlihat di keadaan kosong dengan catatan "ditampilkan jika memilih..."). Teks pesan error ("Wajib diisi.", dst.) ditulis sendiri.
 - Frame Figma GrowthCamp pertama (`l_c`) menampilkan tombol "Kembali ke program" dan tanpa tautan "Kembali ke GrowthCamp" di atas; semua langkah memakai tautan atas yang sama.
 
+## Learn
+
+`/learn` dibangun ulang dari frame terbaru (`docs/design/learn/`): hero + foto, Skills to Start With, blok GrowthCamp (foto workshop, gambaran pembelajaran), From Learning to Practice, Good to Know, dan penutup Find Your Starting Point. Memakai komponen bersama `src/components/program/sections.tsx`; foto di `src/assets/learn/`. Audit vs PDF: selisih rata-rata ±41px dari ±4.4k px. Jawaban FAQ ke-2 dan ke-3 ditulis sendiri (`TODO(review)` di `src/data/learn-content.ts`).
+Komponen bersama berubah sedikit: `Polaroid` kini hanya membungkus foto (keterangan di luar bingkai, sesuai desain), `Timeline` punya tinggi langkah minimum dan varian `bright`, `FaqSection` punya `eyebrow` opsional.
+
 ## Belum
 
-1. Halaman Learn terbaru (`/learn`; frame ke-1 `l_a` di `2. PAGE LEARN.pdf`, perlu diekstrak ulang dengan tinggi ±4500).
-2. Login/Loading dan dialog.
-3. Tinjau kembali tinggi halaman landing/form vs desain bila perlu (selisih ±3-5%).
+1. Login/Loading dan dialog: sengaja dilewati atas permintaan pemilik; `/login` tetap Coming Soon.
+2. Tinjau kembali tinggi halaman vs desain bila perlu (selisih ±1-5%); halaman lama Discover/Grow/Apply masih 3-6% beda.
+
+Alur end to end (Home, Discover, Learn, Apply, program, form, selesai) sudah lengkap dan mengikuti Figma.
 
 ## Cara lanjut (koordinat frame di PDF, y0=267, zoom 1)
 
