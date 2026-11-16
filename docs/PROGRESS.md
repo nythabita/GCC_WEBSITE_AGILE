@@ -6,17 +6,18 @@ Berhenti karena batas kuota: halaman pertama memakai ±53% limit 5 jam (sudah te
 
 | Commit | Isi |
 |---|---|
-| `c3852e0` | GrowthX landing `/apply/growthx`, komponen bersama `src/components/program/sections.tsx`, data `src/data/growthx-content.ts`, foto `src/assets/program/`, skrip QA `docs/qa/audit.mjs` dan `docs/qa/compare.py`, route placeholder `/apply/growthx/form` |
+| `c3852e0` | GrowthX landing `/apply/growthx` + komponen bersama `src/components/program/sections.tsx`, skrip QA `audit.mjs` dan `compare.py` |
+| `75be961` | GrowthConnect landing `/apply/growthconnect` |
+| `8e0de54` | GrowthCamp landing `/learn/growthcamp` (sumber: frame landing di `2. PAGE LEARN.pdf`) |
 
-Cek lolos: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/routes.mjs` (semua route OK, ditambah `/apply/growthx/form`).
-Audit posisi vertikal vs PDF (`audit.mjs`): 190 blok teks cocok, selisih rata-rata kecil, terburuk ±100px dari ±9000px (tinggi halaman ±8.7k vs 9270 di desain; footer & beberapa kartu masih sedikit lebih rapat).
+Tombol CTA tiap program menuju `/apply/growthx/form`, `/apply/growthconnect/form`, `/learn/growthcamp/form` (Coming Soon sampai form dibangun).
+Cek lolos tiap halaman: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/routes.mjs`. Audit posisi vertikal vs PDF: selisih rata-rata GrowthX -0,5px, GrowthConnect +21px, GrowthCamp +43px (terburuk ±100-140px dari 7-9k px).
 
 ## Belum
 
-1. **GrowthConnect** `/apply/growthconnect` (landing; sumber `4. PAGE APPLY - GROWTHCONNECT.pdf`). Bisa langsung memakai `sections.tsx` (SectionHead, CardStack, LabeledList, Timeline, CaseCard, FaqSection, BerryClosing). Beda dengan GrowthX: kartu pakai judul serif, "Tell Us the Real Problem" = 5 pertanyaan (LabeledList label "Pertanyaan"), tidak ada foto hero, logo `logoGrowthConnect`.
-2. **GrowthCamp** `/learn/growthcamp` (sumber `2. PAGE LEARN.pdf`, frame ke-2 `l_b` = landing panjang). Frame ke-1 (`l_a`) adalah halaman Learn terbaru (`/learn` perlu dibangun ulang).
-3. Form multi-langkah per program (GrowthX 6 layar, GrowthConnect 6, GrowthCamp 7: kontak, isian, review, "Simulasi Selesai"), Login/Loading, dialog.
-4. Halaman Learn terbaru.
+1. Form multi-langkah per program (GrowthX 6 layar, GrowthConnect 6, GrowthCamp 7: kontak, isian, review, "Simulasi Selesai"). Rencana: satu mesin form berbasis konfigurasi.
+2. Halaman Learn terbaru (`/learn`; frame ke-1 `l_a` di `2. PAGE LEARN.pdf`, perlu diekstrak ulang dengan tinggi ±4500).
+3. Login/Loading, dialog.
 
 ## Cara lanjut (koordinat frame di PDF, y0=267, zoom 1)
 
@@ -26,7 +27,7 @@ Perintah ekstraksi yang dipakai (jalankan dari `docs/qa`, output ke folder semen
 python -I pdf_extract.py "<pdf>" <outdir> --y0=267 --zoom=1 <name>:<x>:392:<tinggi> ...
 ```
 
-- GrowthX: `x_landing:602:392:9270 x_f1:1162 x_f2:1606 x_f3:2052 x_f4:2496 x_f5:2942 x_f6:3386` (form tinggi ±3600; tinggi sebenarnya perlu dicek per frame).
+- (landing GrowthX/GrowthConnect/GrowthCamp sudah selesai) GrowthX: `x_landing:602:392:9270 x_f1:1162 x_f2:1606 x_f3:2052 x_f4:2496 x_f5:2942 x_f6:3386` (form tinggi ±3600; tinggi sebenarnya perlu dicek per frame).
 - GrowthConnect: `c_landing:76:392:10223 c_f1:619 c_f2:1066 c_f3:1509 c_f4:1956 c_f5:2399 c_f6:2846`.
 - Learn: `l_a:296 (tinggi ±4500) l_b:796:392:8270 l_c:1249 l_d:1749 l_e:2209 l_f:2669 l_g:3129 l_h:3589`.
 - Alur kerja per halaman: ekstrak, bangun, `node docs/qa/audit.mjs <url> <frame>.txt` (selisih y per baris teks), `python -I docs/qa/compare.py` (berdampingan), lalu tsc/oxlint/build/routes.
@@ -43,6 +44,6 @@ python -I pdf_extract.py "<pdf>" <outdir> --y0=267 --zoom=1 <name>:<x>:392:<ting
 
 ## Perlu ditinjau manusia
 
-- **Jawaban FAQ GrowthX**: Figma hanya menampilkan jawaban pertama ("Belum. GCC meninjau..."). Tiga jawaban lain dirangkai dari kalimat di halaman yang sama; ada penanda `TODO(review)` di `src/data/growthx-content.ts`.
+- **Jawaban FAQ GrowthX**: Figma hanya menampilkan jawaban pertama ("Belum. GCC meninjau..."). Tiga jawaban lain dirangkai dari kalimat di halaman yang sama; ada penanda `TODO(review)` di `src/data/growthx-content.ts`. Hal yang sama berlaku untuk FAQ di `growthconnect-content.ts` dan `growthcamp-content.ts` (hanya jawaban pertama yang ada di Figma).
 - Warna hijau memakai `#00C090` (keputusan pemilik), bukan `#00B58C` dari PDF.
 - Lisensi Budget 2012 dan penggantian EB Garamond masih perlu dikonfirmasi (lihat HANDOFF).
