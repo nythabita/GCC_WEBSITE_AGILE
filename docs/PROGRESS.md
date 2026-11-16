@@ -34,6 +34,10 @@ Dari `0. LOGIN TO HOMEPAGE.pdf` (8 layar login + 6 keyframe loading): `/login` (
 - Foto latar login di Figma tidak ter-ekspor; dipakai foto homepage (`hero-internal-training`) dengan lapisan putih pudar sebagai placeholder.
 - `PreviewPage` (Coming Soon) dihapus karena tidak dipakai lagi.
 
+## Deploy (Vercel)
+
+`vercel.json` (framework vite, build `npm run build`, output `dist`, rewrite semua path ke `/index.html` agar refresh di route dalam tidak 404) dan `engines.node >= 22.12.0` di `package.json` (Vite 8). Tidak ada environment variable yang dibutuhkan sampai Supabase tersambung. Build produksi lokal (`vite preview`) lolos `routes.mjs` dan `login-flow.mjs`. Lisensi font Budget 2012 belum dipastikan; pertimbangkan proteksi password pada preview publik.
+
 ## Belum
 
 1. Tinjau kembali tinggi halaman vs desain bila perlu (selisih ±1-5%); halaman lama Discover/Grow/Apply masih 3-6% beda.
