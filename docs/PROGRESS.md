@@ -26,12 +26,20 @@ Cek lolos tiap halaman: `npx tsc -b`, `npx oxlint`, `npx vite build`, `docs/qa/r
 `/learn` dibangun ulang dari frame terbaru (`docs/design/learn/`): hero + foto, Skills to Start With, blok GrowthCamp (foto workshop, gambaran pembelajaran), From Learning to Practice, Good to Know, dan penutup Find Your Starting Point. Memakai komponen bersama `src/components/program/sections.tsx`; foto di `src/assets/learn/`. Audit vs PDF: selisih rata-rata ±41px dari ±4.4k px. Jawaban FAQ ke-2 dan ke-3 ditulis sendiri (`TODO(review)` di `src/data/learn-content.ts`).
 Komponen bersama berubah sedikit: `Polaroid` kini hanya membungkus foto (keterangan di luar bingkai, sesuai desain), `Timeline` punya tinggi langkah minimum dan varian `bright`, `FaqSection` punya `eyebrow` opsional.
 
+## Login, loading, dialog
+
+Dari `0. LOGIN TO HOMEPAGE.pdf` (8 layar login + 6 keyframe loading): `/login` (`src/pages/LoginPage.tsx`) adalah alur demo tanpa akun nyata: Sign in (email, kolom terisi email demo saat disentuh, validasi) → Check your email (6 kotak kode, kode demo 123456, tempel/auto-maju) → You're signed in → Continue to homepage; cabang Continue with Google (akun demo), Create Your GCC Account (terisi demo), dan layar "Code ready to resend" (itulah "dialog" di desain). Layar loading (`src/components/UI/loading.tsx`) muncul 0,9 detik tiap langkah maju. Navbar/footer disembunyikan di `/login` (full-screen seperti desain). Uji: `node docs/qa/login-flow.mjs <baseUrl>` (18 cek).
+- Teks desain berbahasa Inggris; diikuti apa adanya.
+- Ditulis sendiri (tidak ada di Figma): pesan "Enter a valid email address." dan "That code is not correct. Use demo code 123456.", serta gerak loading (logo berdenyut, hanya bila `prefers-reduced-motion` tidak aktif; Figma hanya punya keyframe statis).
+- Foto latar login di Figma tidak ter-ekspor; dipakai foto homepage (`hero-internal-training`) dengan lapisan putih pudar sebagai placeholder.
+- `PreviewPage` (Coming Soon) dihapus karena tidak dipakai lagi.
+
 ## Belum
 
-1. Login/Loading dan dialog: sengaja dilewati atas permintaan pemilik; `/login` tetap Coming Soon.
-2. Tinjau kembali tinggi halaman vs desain bila perlu (selisih ±1-5%); halaman lama Discover/Grow/Apply masih 3-6% beda.
+1. Tinjau kembali tinggi halaman vs desain bila perlu (selisih ±1-5%); halaman lama Discover/Grow/Apply masih 3-6% beda.
+2. Sambungan backend (login nyata, simpan form) belum ada; semua konten dan alur masih statis/simulasi.
 
-Alur end to end (Home, Discover, Learn, Apply, program, form, selesai) sudah lengkap dan mengikuti Figma.
+Alur end to end (Login, Home, Discover, Learn, Apply, program, form, selesai) lengkap dan mengikuti Figma.
 
 ## Cara lanjut (koordinat frame di PDF, y0=267, zoom 1)
 
