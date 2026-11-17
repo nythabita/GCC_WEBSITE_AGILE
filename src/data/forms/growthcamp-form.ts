@@ -1,4 +1,4 @@
-import type { FormConfig } from "../../components/form/types";
+import type { FormConfig } from "../../../shared/form-types.ts";
 
 // GrowthCamp registration form, from the "2. PAGE LEARN" Figma export (5 steps + finished screen).
 // Draft decisions (not in Figma): WhatsApp variant of the contact field and "terisi" wording on the review list.

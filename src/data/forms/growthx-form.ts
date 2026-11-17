@@ -1,4 +1,4 @@
-import type { FormConfig } from "../../components/form/types";
+import type { FormConfig } from "../../../shared/form-types.ts";
 
 // GrowthX application form, from the "3. PAGE APPLY (GROWTH X)" Figma export (5 steps + finished screen).
 // Draft decisions (not in Figma): WhatsApp variant of the contact field, "terisi" wording on the review list.
