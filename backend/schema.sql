@@ -28,18 +28,28 @@ DECLARE
   labels text[] := ARRAY['Learn', 'Apply', 'Grow'];
 BEGIN
   IF NOT coalesce(public.gcc_json_has_keys(doc, ARRAY['schemaVersion','contentStatus','notice','hero','about','journey'])
-    AND doc->'schemaVersion' = '1'::jsonb
+    AND doc->'schemaVersion' IN ('1'::jsonb,'2'::jsonb)
     AND doc->>'contentStatus' IN ('example','approved')
     AND public.gcc_plain_text(doc->'notice', doc->>'contentStatus' = 'approved')
     AND octet_length(doc::text) <= 65536, false) THEN RETURN false; END IF;
-  IF NOT coalesce(public.gcc_json_has_keys(doc->'hero', ARRAY['title','description','ctaLabel','ctaHref'])
-    AND public.gcc_plain_text(doc#>'{hero,title}') AND public.gcc_plain_text(doc#>'{hero,description}')
-    AND doc#>>'{hero,ctaLabel}' = 'Explore GCC' AND doc#>>'{hero,ctaHref}' = '#journey'
+  IF NOT coalesce(public.gcc_plain_text(doc#>'{hero,title}') AND public.gcc_plain_text(doc#>'{hero,description}')
     AND public.gcc_json_has_keys(doc->'about', ARRAY['title','description'])
     AND public.gcc_plain_text(doc#>'{about,title}') AND public.gcc_plain_text(doc#>'{about,description}')
     AND public.gcc_json_has_keys(doc->'journey', ARRAY['title','description','items'])
     AND public.gcc_plain_text(doc#>'{journey,title}') AND public.gcc_plain_text(doc#>'{journey,description}')
     AND jsonb_typeof(doc#>'{journey,items}') = 'array', false) THEN RETURN false; END IF;
+  IF doc->'schemaVersion'='1'::jsonb THEN
+    IF NOT coalesce(public.gcc_json_has_keys(doc->'hero', ARRAY['title','description','ctaLabel','ctaHref'])
+      AND doc#>>'{hero,ctaLabel}'='Explore GCC' AND doc#>>'{hero,ctaHref}'='#journey',false) THEN RETURN false; END IF;
+  ELSE
+    IF NOT public.gcc_json_has_keys(doc->'hero',ARRAY['title','description','actions']) OR jsonb_typeof(doc#>'{hero,actions}') IS DISTINCT FROM 'array' THEN RETURN false; END IF;
+    IF jsonb_array_length(doc#>'{hero,actions}')<>2 THEN RETURN false; END IF;
+    FOR i IN 0..1 LOOP
+      part := doc#>'{hero,actions}'->i;
+      IF NOT coalesce(public.gcc_json_has_keys(part,ARRAY['label','href']) AND public.gcc_plain_text(part->'label')
+        AND part->>'href'=CASE WHEN i=0 THEN '/programs' ELSE '/assessment' END,false) THEN RETURN false; END IF;
+    END LOOP;
+  END IF;
   IF jsonb_array_length(doc#>'{journey,items}') <> 3 THEN RETURN false; END IF;
   FOR i IN 0..2 LOOP
     stage := doc#>'{journey,items}'->i;

@@ -137,7 +137,7 @@ export const growthconnectForm: FormConfig = {
   ],
   review: {
     title: "Review Your Submission",
-    description: "Periksa dan ubah jawaban sebelum menyelesaikan simulasi pengajuan tantangan bisnis.",
+    description: "Periksa dan ubah jawaban sebelum mengirim pengajuan tantangan bisnis.",
     finishLabel: "Selesaikan Simulasi",
     sections: [
       {

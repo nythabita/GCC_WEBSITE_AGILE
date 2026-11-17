@@ -1,6 +1,7 @@
 import type { HomepageContent } from "../../../shared/homepage";
 import { heroCircles } from "../../assets/home";
-import { heroActions, heroCaptions, heroPhotos } from "../../data/homepage-content";
+import { heroCaptions, heroPhotos } from "../../data/homepage-content";
+import { Link } from "react-router";
 import { buttonStyles } from "../UI/button-styles";
 import { cqw, pinStyle, type Box, type Pin } from "./collage";
 
@@ -45,6 +46,7 @@ function HeroCollage() {
 export default function HeroSection({ content }: { content: HomepageContent["hero"] }) {
   // The design stacks the three sentences and tints the last one.
   const lines = content.title.split(/(?<=[.!?])\s+/);
+  const actions = 'actions' in content ? content.actions : [{ label: content.ctaLabel, href: content.ctaHref }];
 
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-brand-green text-paper">
@@ -58,12 +60,7 @@ export default function HeroSection({ content }: { content: HomepageContent["her
           </h1>
           <p className="mt-4 max-w-[345px] text-sm leading-[1.35] md:max-w-xl md:text-lg lg:mt-6 lg:max-w-2xl lg:text-xl lg:leading-relaxed">{content.description}</p>
           <div className="mt-[22px] flex flex-col gap-2.5 md:flex-row md:gap-4">
-            <a href={heroActions.primary.href} className={buttonStyles({ variant: "rose", size: "lg", fullWidth: true, className: "md:w-auto" })}>
-              {heroActions.primary.label}
-            </a>
-            <a href={heroActions.secondary.href} className={buttonStyles({ variant: "paper", size: "lg", fullWidth: true, className: "md:w-auto" })}>
-              {heroActions.secondary.label}
-            </a>
+            {actions.map((action, i) => <Link key={action.href} to={action.href} className={buttonStyles({ variant: i === 0 ? "rose" : "paper", size: "lg", fullWidth: true, className: "md:w-auto" })}>{action.label}</Link>)}
           </div>
         </div>
         <HeroCollage />

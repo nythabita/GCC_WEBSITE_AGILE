@@ -4,6 +4,7 @@ import { ArrowRight, Check, ChevronDown, Menu, X } from "lucide-react";
 import { getSectionLabel, isPathActive, navigation, secondaryNavigation } from "../../data/navigation";
 import { logoGccColor } from "../../assets/brand";
 import { buttonStyles } from "../UI/button-styles";
+import { useAuth } from "../../auth/AuthContext";
 
 const desktopLinkClass = ({ isActive }: { isActive: boolean }) =>
   `inline-flex min-h-11 items-center border-b-2 px-1 text-[15px] font-semibold transition-colors duration-150 ${isActive ? "border-teal-deep text-nav-ink" : "border-transparent text-nav-ink/70 hover:text-nav-ink"}`;
@@ -11,11 +12,22 @@ const desktopLinkClass = ({ isActive }: { isActive: boolean }) =>
 const drawerLinkClass = "flex min-h-12 flex-1 items-center rounded-xl px-4 text-[15px] font-medium text-nav-ink";
 
 export default function Navbar() {
+  const { session, services } = useAuth();
+  const [logoutError, setLogoutError] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const { pathname } = useLocation();
   const sectionLabel = getSectionLabel(pathname);
   const close = () => setIsOpen(false);
+  const logout = async () => {
+    if (!services || signingOut) return;
+    setSigningOut(true);setLogoutError("");
+    const {error} = await services.client.auth.signOut({scope:'local'});
+    if(error)setLogoutError("Logout belum berhasil. Coba lagi.");else close();
+    setSigningOut(false);
+  };
+  const logoutButton = <button type="button" disabled={signingOut} onClick={() => void logout()} className="min-h-11 text-sm font-semibold text-teal-deep">{signingOut ? "Keluar…" : "Logout"}</button>;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,7 +64,7 @@ export default function Navbar() {
           <ul className="flex items-center gap-5">
             {secondaryNavigation.map((item) => (
               <li key={item.path}>
-                <NavLink to={item.path} className={desktopLinkClass}>{item.label}</NavLink>
+                {item.path === '/login' && session ? logoutButton : <NavLink to={item.path} className={desktopLinkClass}>{item.label}</NavLink>}
               </li>
             ))}
           </ul>
@@ -142,13 +154,14 @@ export default function Navbar() {
             <ul className="mt-5 flex flex-col">
               {secondaryNavigation.map((item) => (
                 <li key={item.path}>
-                  <Link to={item.path} onClick={close} className="flex min-h-11 items-center text-sm font-semibold text-teal-deep">{item.label}</Link>
+                  {item.path === '/login' && session ? logoutButton : <Link to={item.path} onClick={close} className="flex min-h-11 items-center text-sm font-semibold text-teal-deep">{item.label}</Link>}
                 </li>
               ))}
             </ul>
           </nav>
         </div>
       )}
+      {logoutError && <p role="alert" className="page-container py-2 text-sm text-berry">{logoutError}</p>}
     </header>
   );
 }

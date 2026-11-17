@@ -102,7 +102,7 @@ export const growthcampForm: FormConfig = {
   ],
   review: {
     title: "Review Your Answers",
-    description: "Periksa dan ubah jawaban sebelum menyelesaikan simulasi. Ringkasan ini mengikuti isian pada langkah sebelumnya.",
+    description: "Periksa dan ubah jawaban sebelum mengirim pengajuan. Ringkasan ini mengikuti isian pada langkah sebelumnya.",
     finishLabel: "Selesaikan Simulasi",
     sections: [
       {

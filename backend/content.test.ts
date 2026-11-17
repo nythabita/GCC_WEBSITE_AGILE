@@ -11,6 +11,7 @@ test('valid content preserves the frontend hero, about and ordered journey contr
   const result = validateHomepage(copy());
   assert.ok(result, 'validated content must be returned');
   assert.equal(result.schemaVersion, 1);
+  assert.ok(result.schemaVersion === 1);
   assert.equal(result.hero.ctaHref, '#journey');
   assert.deepEqual(result.journey.items.map((x: { href: string }) => x.href), ['/learn', '/apply', '/grow']);
   assert.equal(result.contentStatus, 'example');

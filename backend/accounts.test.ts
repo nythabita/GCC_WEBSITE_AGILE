@@ -15,7 +15,7 @@ test('Postgres enforces private immutable submissions, validation, owner default
       CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$;
       GRANT USAGE ON SCHEMA auth TO authenticated; GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;`);
     const accounts = await readFile(new URL('./accounts.sql', import.meta.url), 'utf8');
-    await db.exec(buildFormSchema()); await db.exec(accounts);
+    await db.exec(await readFile(new URL('./forms.generated.sql', import.meta.url), 'utf8')); await db.exec(accounts);
     await db.query('INSERT INTO auth.users(id,raw_user_meta_data) VALUES ($1,$2),($3,$4)', [owner, {full_name:'Student A'}, other, {full_name:'Student B'}]);
     await db.exec(`SET ROLE anon`);
     for (const table of ['profiles', 'program_applications']) await assert.rejects(db.exec(`SELECT * FROM public.${table}`), /permission denied/);

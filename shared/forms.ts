@@ -75,6 +75,7 @@ export function validateAnswers(slug: string, input: unknown): Record<string, st
     } else {
       if (typeof v !== 'string') { errors[rule.id] = 'Jawaban harus berupa teks.'; continue; }
       const text = v.trim();
+      // oxlint-disable-next-line no-control-regex -- Reject non-printing input, allowing tab/LF/CR for prose answers.
       if (text.length > 10000 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(text)) errors[rule.id] = 'Teks tidak valid atau terlalu panjang.';
       if (rule.options && !rule.options.includes(text)) errors[rule.id] = 'Pilihan tidak valid.';
       if (rule.maxWords && text.split(/\s+/u).filter(Boolean).length > rule.maxWords) errors[rule.id] = `Maksimal ${rule.maxWords} kata.`;

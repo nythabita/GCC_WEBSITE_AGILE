@@ -1,6 +1,6 @@
 // Config-driven multi-step form used by the program application flows (GrowthX, GrowthConnect, GrowthCamp).
-// A form is a list of steps (fields), an automatic review step, and a "simulation finished" screen.
-// Answers live in component state only; nothing is sent anywhere (the design says "Jawaban tidak dikirim atau disimpan").
+// A form is a list of fields plus a review step. ProgramForm persists final answers to the private backend.
+// Informational legacy done copy is retained in configuration; real completion uses the server receipt.
 
 export type Answers = Record<string, string | string[]>;
 

@@ -128,7 +128,7 @@ export const growthxForm: FormConfig = {
   ],
   review: {
     title: "Review Your Answers",
-    description: "Periksa dan ubah jawaban sebelum menyelesaikan simulasi formulir awal.",
+    description: "Periksa dan ubah jawaban sebelum mengirim pengajuan awal.",
     finishLabel: "Selesaikan Simulasi",
     sections: [
       {
