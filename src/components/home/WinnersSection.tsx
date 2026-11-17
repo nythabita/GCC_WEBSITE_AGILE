@@ -23,11 +23,37 @@ const labels: Pin[] = [
 ];
 
 const captionSizes = [6, 7, 9];
+const tilts = ["-rotate-2", "rotate-1", "-rotate-1"];
+
+// Desktop (md+): the pinned phone collage does not scale to a wide page, so winners become a row of cards.
+function WinnersDesktop() {
+  return (
+    <div className="mx-auto hidden w-full max-w-7xl px-8 md:block">
+      <h2 className="text-center font-display text-6xl font-bold italic leading-none text-white lg:text-7xl">
+        {winners.title}
+      </h2>
+      <ul className="mt-14 grid grid-cols-3 gap-8 lg:gap-12">
+        {winners.items.map((winner, index) => (
+          <li key={winner.name} className={`${tilts[index]} transition-transform duration-200 hover:rotate-0`}>
+            <div className="overflow-hidden bg-white p-3 pb-14 shadow-xl">
+              <img src={winner.photo} alt={winner.alt} className="block aspect-[4/3] w-full object-cover object-top" />
+            </div>
+            <div className="-mt-10 mx-4 rounded-[10px] bg-black/50 px-3 py-2 text-center text-white backdrop-blur-sm">
+              <p className="text-glow font-display text-2xl font-bold leading-tight">{winner.name}</p>
+              <p className="mt-1 font-sub text-sm font-extrabold leading-snug">{winner.caption}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function WinnersSection() {
   return (
-    <section aria-labelledby="winners-title" className="overflow-hidden pt-1 md:pt-16">
-      <div className="@container relative mx-auto w-full max-w-[390px] md:max-w-[560px]" style={{ aspectRatio: `${BOX.w} / ${BOX.h}` }}>
+    <section aria-label={winners.title} className="overflow-hidden pt-1 md:pt-16">
+      <WinnersDesktop />
+      <div className="@container relative mx-auto w-full max-w-[390px] md:hidden" style={{ aspectRatio: `${BOX.w} / ${BOX.h}` }}>
         <img src={trophy} alt="" aria-hidden="true" className="pointer-events-none select-none" style={{ ...pinStyle({ cx: 172, cy: 409, w: 541.7, rotate: 27.33 }, BOX), aspectRatio: "1" }} />
         {stars.map((pin, index) => (
           <img key={index} src={index === 0 ? starB : starA} alt="" aria-hidden="true" style={{ ...pinStyle(pin, BOX), aspectRatio: "38.25 / 36.61" }} />

@@ -15,21 +15,21 @@ export default function ProgramCard({ program, variant = "home" }: Props) {
 
   return (
     <article aria-labelledby={titleId} className="mx-auto w-full max-w-[326px] md:max-w-none">
-      <div className="relative mx-auto min-h-[419px] w-full max-w-[296px] overflow-hidden rounded-[15px] bg-brand-green px-4 pb-8 pt-4 text-white md:max-w-none">
+      <div className="relative mx-auto min-h-[419px] w-full max-w-[296px] overflow-hidden rounded-[15px] bg-brand-green px-4 pb-8 pt-4 text-white md:max-w-none md:min-h-[460px] md:px-6 md:pt-6 lg:min-h-[500px] lg:px-7">
         <img src={programCardBackground} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-5" />
         <div className="relative">
           <div className="flex items-start justify-between gap-2">
-            <h3 id={titleId} className="font-brand text-[26px] leading-[1.15]">{program.name}</h3>
-            <img src={program.logo.src} alt={program.logo.alt} width={program.logo.width} style={{ width: program.logo.width }} className="-mt-1 h-auto max-w-[45%] shrink-0" />
+            <h3 id={titleId} className="font-brand text-[26px] leading-[1.15] lg:text-3xl">{program.name}</h3>
+            <img src={program.logo.src} alt={program.logo.alt} width={program.logo.width} style={{ width: program.logo.width }} className="-mt-1 h-auto min-w-0 max-w-[40%] shrink object-contain md:max-w-[38%]" />
           </div>
-          <p className="mt-4 inline-flex h-[30px] min-w-[200px] items-center justify-center rounded-[10px] bg-sun px-4 font-display text-xl font-bold italic leading-none text-black">
+          <p className="mt-4 inline-flex h-[30px] min-w-[200px] items-center justify-center rounded-[10px] bg-sun px-4 font-display text-xl font-bold italic leading-none text-black md:h-9 md:text-2xl">
             {badge}
           </p>
-          <ul className="mt-3 flex flex-col gap-[14px]">
+          <ul className="mt-3 flex flex-col gap-[14px] md:mt-5 md:gap-4">
             {program.benefits.map((benefit) => (
-              <li key={benefit} className="grid grid-cols-[25px_1fr] items-start gap-x-3">
-                <img src={iconCheck} alt="" aria-hidden="true" className="size-[25px]" />
-                <span className="font-sub text-xs font-extrabold leading-[15px]">{benefit}</span>
+              <li key={benefit} className="grid grid-cols-[25px_1fr] items-start gap-x-3 md:grid-cols-[28px_1fr]">
+                <img src={iconCheck} alt="" aria-hidden="true" className="size-[25px] md:size-7" />
+                <span className="font-sub text-xs font-extrabold leading-[15px] md:text-sm md:leading-5">{benefit}</span>
               </li>
             ))}
           </ul>

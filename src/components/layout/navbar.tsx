@@ -20,7 +20,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!isOpen) return;
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setIsOpen(false); };
-    const desktop = window.matchMedia("(min-width: 768px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
     const onBreakpoint = () => { if (desktop.matches) setIsOpen(false); };
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -41,7 +41,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop navigation */}
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-6 lg:flex">
           <ul className="flex items-center gap-5">
             {navigation.map((item) => (
               <li key={item.path}>
@@ -60,7 +60,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile: current section + menu button */}
-        <div className="flex items-center gap-5 md:hidden">
+        <div className="flex items-center gap-5 lg:hidden">
           <span className="relative pb-1.5 text-[13px] font-semibold text-nav-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-teal-deep">
             {sectionLabel}
           </span>
@@ -79,7 +79,7 @@ export default function Navbar() {
 
       {/* Mobile drawer */}
       {isOpen && (
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <button type="button" aria-label="Tutup menu" tabIndex={-1} className="fixed inset-x-0 bottom-0 top-20 bg-black/30" onClick={close} />
           <nav
             id="mobile-navigation"

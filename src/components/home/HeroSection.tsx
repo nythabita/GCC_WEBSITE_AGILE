@@ -21,7 +21,7 @@ const captionPins: Pin[] = [
 
 function HeroCollage() {
   return (
-    <div className="@container relative mx-auto w-full max-w-[390px] md:max-w-[480px]" style={{ aspectRatio: `${BOX.w} / ${BOX.h}` }}>
+    <div className="@container relative mx-auto w-full max-w-[390px] md:max-w-[480px] lg:max-w-[600px]" style={{ aspectRatio: `${BOX.w} / ${BOX.h}` }}>
       {polaroids.map(({ pin, ratio, padding: [top, side, bottom] }, index) => (
         <div key={heroPhotos[index].src} className="bg-white shadow-md" style={{ ...pinStyle(pin, BOX), aspectRatio: ratio }}>
           <div className="absolute" style={{ top: cqw(top, BOX.w), bottom: cqw(bottom, BOX.w), left: cqw(side, BOX.w), right: cqw(side, BOX.w) }}>
@@ -48,15 +48,15 @@ export default function HeroSection({ content }: { content: HomepageContent["her
 
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-brand-green text-paper">
-      <img src={heroCircles} alt="" aria-hidden="true" className="pointer-events-none absolute right-0 top-0 w-[390px] max-w-none select-none md:w-[560px]" />
-      <div className="relative mx-auto grid w-full max-w-7xl gap-8 px-6 pb-4 pt-4 md:grid-cols-2 md:items-center md:gap-12 md:px-8 md:py-20">
+      <img src={heroCircles} alt="" aria-hidden="true" className="pointer-events-none absolute right-0 top-0 w-[390px] max-w-none select-none md:w-[560px] lg:w-[720px]" />
+      <div className="relative mx-auto grid w-full max-w-7xl gap-8 px-6 pb-4 pt-4 md:grid-cols-2 md:items-center md:gap-12 md:px-8 md:py-20 lg:gap-16 lg:py-28">
         <div>
-          <h1 id="hero-title" className="font-display text-[32px] font-bold leading-[1.06] md:text-[56px]">
+          <h1 id="hero-title" className="font-display text-[32px] font-bold leading-[1.06] md:text-[56px] lg:text-[76px]">
             {lines.map((line, index) => (
               <span key={line} className={`block ${index === lines.length - 1 ? "text-neon" : ""}`}>{line}</span>
             ))}
           </h1>
-          <p className="mt-4 max-w-[345px] text-sm leading-[1.35] md:max-w-xl md:text-lg">{content.description}</p>
+          <p className="mt-4 max-w-[345px] text-sm leading-[1.35] md:max-w-xl md:text-lg lg:mt-6 lg:max-w-2xl lg:text-xl lg:leading-relaxed">{content.description}</p>
           <div className="mt-[22px] flex flex-col gap-2.5 md:flex-row md:gap-4">
             <a href={heroActions.primary.href} className={buttonStyles({ variant: "rose", size: "lg", fullWidth: true, className: "md:w-auto" })}>
               {heroActions.primary.label}
