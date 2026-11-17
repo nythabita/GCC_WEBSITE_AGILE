@@ -1,16 +1,29 @@
-# Deployed GCC homepage backend
+# GCC deployment evidence
 
-- Supabase project: gcc-homepage
-- Project ref: svyulvjezdzgooywntyl
-- Region: Singapore (ap-southeast-1)
-- Quoted project cost: $0/month (Free)
-- Dashboard: https://supabase.com/dashboard/project/svyulvjezdzgooywntyl
-- REST base: https://svyulvjezdzgooywntyl.supabase.co/rest/v1
-- Read: /homepage_content?id=eq.home&select=id,content,updated_at
-- Frontend environment values: frontend.env.example (publishable only).
+- Project: `gcc-homepage` — `svyulvjezdzgooywntyl`
+- Region: Singapore (`ap-southeast-1`), existing Free project; no new paid project.
+- [Dashboard](https://supabase.com/dashboard/project/svyulvjezdzgooywntyl)
+- Data API: `https://svyulvjezdzgooywntyl.supabase.co/rest/v1`
+- Base frontend commit: `93d4c4296eb06d467acad75b9b80811dddd84aa9`.
 
-Initial schema migration gcc_homepage_content_v1 applied successfully. Initial content is the explicitly labeled example from homepage.example.json; no final PO copy is claimed. Hosted smoke verification passed: public read succeeds; POST/PATCH/DELETE probes with the publishable key are denied. SQL security and performance advisors returned no findings. The local suite has32 passing tests and tsc --noEmit succeeds.
+## Historical hosted v1 (28 October 2026)
 
-Frontend integration is still owned by the frontend teammate: fetch the API, show example notice, render loading/error/retry states, keep the journey anchor and route contract. No frontend source files were changed by this backend delivery.
+Migration `gcc_homepage_content_v1` was applied. Hosted public read, denied public POST/PATCH/DELETE, CORS and security/performance advisors were verified then. These historical results are not evidence for the new profiles/application schemas or today's hosted availability.
 
-Do not expose SUPABASE_SECRET_KEY in frontend, Git or screenshots. To update content later, use the trusted command documented in README.md. No secret key is stored in this repository or supplied as part of the frontend handoff. Hosted maintenance-command writes require the maintainer's own private secret key; HTTP transport is locally tested, while the first hosted example was inserted through the authorized Supabase connection.
+## Current integration (18 November 2026)
+
+- Restore of the paused project was requested successfully; last observed project status is `RESTORING`.
+- New account/application schemas and homepage v2 are implemented and tested locally, **not yet applied hosted** while restoration is pending.
+- Local backend suite: 44 passed; includes real PostgreSQL grants/RLS, validation, private owner defaults, duplicate constraint and cascade checks through PGlite.
+- Browser suite: 9 passed, covering auth guard, Google-only minimum login, field diagnostics, three forms' failed/success/reload receipt flows, logout and contribution-answer alignment. Auth/provider/HTTP are fixtures, not real Google authorization.
+- Backend TypeScript, root TypeScript/production build and lint passed. Production build has a large-chunk warning.
+- npm audit reports the pre-existing `picomatch` advisory through Vite's build tooling; no patched version listed when reviewed. See setup notes. Audit is **not clean**.
+- User chose Google-only bare minimum: SMTP/email OTP are deferred. Google OAuth and final frontend URL are not configured/verified yet. Google button is gated by `VITE_GOOGLE_AUTH_ENABLED` until setup is complete.
+
+No public user-ready completion claim is made until migration, real Google OAuth and real user-to-database checks pass. Update this file with later evidence rather than replacing history with assumptions.
+
+## Deployment sequence
+
+After `ACTIVE_HEALTHY`, inspect existing schema and apply `schema.sql`, `forms.generated.sql`, then `accounts.sql` through recorded migrations. Publish `homepage.v2.json` (example status pending PO). Re-run hosted public/private access probes and advisors. Follow [BACKEND_SETUP](../docs/BACKEND_SETUP.md) for auth/redirect/environment configuration and launch acceptance checks.
+
+Never place Supabase secret/service-role keys, Google Client Secret, App Passwords, tokens, personal answers or real OTPs in source, screenshots, logs, PR descriptions or chat.

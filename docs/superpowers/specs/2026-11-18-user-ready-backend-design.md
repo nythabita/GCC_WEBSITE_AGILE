@@ -1,5 +1,9 @@
 # GCC user-ready backend design
 
+## Revisi scope yang disetujui di chat
+
+Pengguna kemudian memilih **Google saja dulu** dan **bare minimum**. Revisi ini menggantikan kebutuhan email/OTP/SMTP di bagian historis rancangan di bawah: hanya Google OAuth ditawarkan, akun dibuat pada login Google pertama, dan tidak ada konfigurasi SMTP yang diperlukan. Akun/profil, pengajuan tiga program, validasi/RLS, serta integrasi yang sudah dibangun tetap berlaku. Tidak menambah fitur baru.
+
 ## Tujuan dan acuan
 
 Mengubah alur yang sudah tersedia di GitHub menjadi alur nyata: akun, session, pengajuan dan jawaban asesmen tiga program, serta konten homepage melalui Supabase. Acuan frontend adalah `feature/navigation` pada commit `93d4c4296eb06d467acad75b9b80811dddd84aa9`. Desain visual dan pertanyaan bisnis mengikuti kode tersebut.

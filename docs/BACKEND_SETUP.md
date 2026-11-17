@@ -64,19 +64,9 @@ HTTP 401 berarti login perlu diperbarui; 400/422 berarti data tidak dapat diteri
 
 Pengelola meninjau data melalui Supabase Dashboard dengan akun pengelola, bukan dengan menaikkan hak user dari browser. `gcc_private` tidak boleh dimasukkan ke daftar exposed schemas Data API.
 
-## Email OTP untuk pengguna umum
+## Login minimum: Google saja
 
-SMTP default Supabase hanya melayani alamat anggota organisasi dan bukan layanan produksi publik. Gunakan SMTP khusus sebelum meluncurkan signup/login email:
-
-1. Siapkan akun pengirim yang dikelola tim. Opsi tanpa membeli domain untuk pemakaian awal: SMTP Gmail khusus GCC. Ini memiliki batas pengiriman, bukan layanan email tanpa batas.
-2. Aktifkan 2-Step Verification di akun Google pengirim. Buat App Password jika akun mendukungnya. Pemilik memasukkannya **langsung ke dashboard Supabase**, tidak ke chat, Git, environment frontend, atau screenshot.
-3. Buka Auth → Email/SMTP di [dashboard project](https://supabase.com/dashboard/project/svyulvjezdzgooywntyl). Untuk Gmail: host `smtp.gmail.com`, port `465` dengan SSL/TLS atau `587` STARTTLS; username dan sender adalah email pengirim yang sama; password adalah App Password.
-4. Pada template **Confirm signup** dan **Magic Link**, tampilkan `{{ .Token }}`. Contoh isi: `Kode verifikasi GCC Anda: {{ .Token }}. Abaikan jika Anda tidak meminta kode ini.` Atur panjang OTP menjadi 6 digit agar sesuai input aplikasi. Pertahankan expiry dan rate limit yang wajar; jangan menonaktifkan verifikasi email.
-5. Uji signup baru dan login akun lama menggunakan inbox yang bukan anggota organisasi Supabase. Uji kode salah, kedaluwarsa, resend, serta email gagal dikirim.
-
-Jika Gmail/App Password tidak tersedia untuk akun tersebut, ganti dengan SMTP transactional Free yang telah diverifikasi pengirimnya. Jangan mengaktifkan opsi berbayar otomatis atau membeli domain tanpa persetujuan.
-
-Referensi: [Supabase custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp), [Email OTP](https://supabase.com/docs/guides/auth/auth-email-passwordless), [Google App Passwords](https://support.google.com/mail/answer/185833), [Gmail SMTP](https://developers.google.com/workspace/gmail/imap/imap-smtp), [batas Gmail](https://support.google.com/mail/answer/22839).
+Sesuai keputusan terbaru pengguna, email/OTP dan SMTP ditunda. Akun dibuat otomatis pada login Google pertama. Jangan menawarkan login email sebelum layanan pengirim dan pengujiannya benar-benar tersedia.
 
 ## Google OAuth dan URL aplikasi
 
@@ -92,8 +82,8 @@ Untuk frontend Vercel, deploy branch integrasi ini dan isi environment dari `.en
 ## Kriteria peluncuran
 
 - Migration telah diterapkan pada project sehat, dan advisor serta hosted access checks ditinjau.
-- Email OTP benar-benar sampai ke pengguna umum; signup/login/logout/refresh session berhasil.
-- Google OAuth aktif dan callback berhasil untuk akun di luar tim, jika tombol Google ditawarkan.
+- Login Google pertama membuat akun/profil; login berikutnya, logout dan refresh session berhasil.
+- Google OAuth aktif dan callback berhasil untuk akun di luar tim.
 - Ketiga form menyimpan jawaban; user lain dan akses anonim tidak dapat membaca pengajuan tersebut.
 - Retry/duplikasi tidak membuat data ganda, dan konfirmasi menampilkan ID serta waktu server.
 - Halaman sukses tidak muncul saat provider/database gagal.

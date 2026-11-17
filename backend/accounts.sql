@@ -3,7 +3,7 @@ BEGIN;
 CREATE OR REPLACE FUNCTION gcc_private.application_valid(slug text, version integer, answers jsonb)
 RETURNS boolean LANGUAGE plpgsql IMMUTABLE SET search_path = '' AS $$
 DECLARE rules jsonb := gcc_private.form_rules(slug); rule jsonb; val jsonb; controlling jsonb;
-  key text; clean text; mode text; required boolean; count_selected integer;
+  key text; clean text; mode text; port text; required boolean; count_selected integer;
 BEGIN
   IF rules IS NULL OR version <> 1 OR answers IS NULL OR jsonb_typeof(answers) <> 'object' OR octet_length(answers::text) > 65536 THEN RETURN false; END IF;
   FOR key IN SELECT jsonb_object_keys(answers) LOOP
@@ -13,20 +13,20 @@ BEGIN
     key := rule->>'id'; val := answers->key;
     IF rule ? 'showIf' THEN
       controlling := answers->(rule#>>'{showIf,field}');
-      IF NOT coalesce(controlling = rule#>'{showIf,equals}' OR (jsonb_typeof(controlling)='array' AND controlling @> jsonb_build_array(rule#>'{showIf,equals}')), false) THEN CONTINUE; END IF;
+      IF NOT coalesce(controlling = rule#>'{showIf,equals}' OR (jsonb_typeof(controlling)='array' AND controlling @> jsonb_build_array(rule#>'{showIf,equals}')), false) THEN IF val IS NOT NULL THEN RETURN false; END IF; CONTINUE; END IF;
     END IF;
     IF rule ? 'requiredWhen' THEN
       controlling := answers->(rule#>>'{requiredWhen,field}');
-      IF jsonb_typeof(controlling) IS DISTINCT FROM 'array' THEN CONTINUE; END IF;
-      IF NOT EXISTS (SELECT 1 FROM jsonb_array_elements_text(controlling) x WHERE x <> rule#>>'{requiredWhen,anyBut}') THEN CONTINUE; END IF;
+      IF jsonb_typeof(controlling) IS DISTINCT FROM 'array' THEN IF val IS NOT NULL THEN RETURN false; END IF; CONTINUE; END IF;
+      IF NOT EXISTS (SELECT 1 FROM jsonb_array_elements_text(controlling) x WHERE x <> rule#>>'{requiredWhen,anyBut}') THEN IF val IS NOT NULL THEN RETURN false; END IF; CONTINUE; END IF;
     END IF;
     IF rule ? 'selectedFrom' THEN
       controlling := answers->(rule->>'selectedFrom');
       IF jsonb_typeof(controlling) IS DISTINCT FROM 'array' THEN RETURN false; END IF;
       count_selected := jsonb_array_length(controlling);
-      IF count_selected <= (rule->>'selectionIndex')::integer THEN CONTINUE; END IF;
+      IF count_selected <= (rule->>'selectionIndex')::integer THEN IF val IS NOT NULL THEN RETURN false; END IF; CONTINUE; END IF;
     END IF;
-    IF rule ? 'alternative' AND answers->>(rule->>'alternative') = 'yes' THEN CONTINUE; END IF;
+    IF rule ? 'alternative' AND answers->>(rule->>'alternative') = 'yes' THEN IF val IS NOT NULL THEN RETURN false; END IF; CONTINUE; END IF;
     required := (rule->>'required')::boolean OR rule ? 'requiredWhen' OR rule ? 'selectedFrom';
     IF val IS NULL OR val = '""'::jsonb THEN
       IF required THEN RETURN false; ELSE CONTINUE; END IF;
@@ -48,7 +48,11 @@ BEGIN
       mode := CASE WHEN rule ? 'dynamic' THEN rule#>'{dynamic,modes}' ->> (answers->>(rule#>>'{dynamic,by}')) ELSE rule->>'mode' END;
       IF mode='email' AND clean !~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$' THEN RETURN false; END IF;
       IF mode='tel' AND clean !~ '^[+0-9][0-9[:space:]-]{7,}$' THEN RETURN false; END IF;
-      IF mode='url' AND clean !~ '^https?://[^[:space:]/?#@]+([/?#][^[:space:]]*)?$' THEN RETURN false; END IF;
+      IF mode='url' THEN
+        IF clean !~* '^https?://[a-z0-9]([a-z0-9.-]*[a-z0-9])?(:[0-9]{1,5})?([/?#][^[:space:]]*)?$' THEN RETURN false; END IF;
+        port := substring(clean from '^https?://[^/?#]*:([0-9]+)');
+        IF port IS NOT NULL AND port::integer>65535 THEN RETURN false; END IF;
+      END IF;
     END IF;
   END LOOP;
   RETURN true;

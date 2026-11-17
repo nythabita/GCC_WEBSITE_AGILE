@@ -33,14 +33,21 @@ test('a logged-out visitor must sign in before accessing a program form', async 
   await expect(page.getByRole('heading',{name:'Sign in to GCC'})).toBeVisible();
   await expect(page.getByText('Prototype: tap the field to use a demo email.')).toHaveCount(0);
 });
-test('an OTP request failure stays on sign in and does not fabricate a verification session', async ({page})=> {
-  await page.route('**/auth/v1/otp',route=>route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({msg:'Mail provider unavailable'})}));
+test('minimum login offers Google only and never exposes the deferred OTP form', async ({page})=> {
   await page.goto('/login');
-  await page.getByLabel('Email address',{exact:true}).fill('tester@example.com');
-  await page.getByRole('button',{name:'Continue',exact:true}).click();
-  await expect(page.getByRole('alert')).toBeVisible();
-  await expect(page.getByRole('heading',{name:'Check your email'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Continue with Google',exact:true})).toBeVisible();
+  await expect(page.getByLabel('Email address',{exact:true})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Create Account',exact:true})).toHaveCount(0);
   await expect(page.getByText('You’re signed in',{exact:true})).toHaveCount(0);
+});
+test('invalid URL shows an actionable field error before advancing to review', async({page})=> {
+  await signInFixture(page); await page.route('**/rest/v1/program_applications*',route=>route.fulfill({status:200,contentType:'application/json',body:'[]'}));
+  await page.goto('/apply/growthx/form'); await completeForm(page,2);
+  for (const field of await page.locator('form input[type=text],form textarea').all()) await field.fill('Jawaban uji');
+  await page.locator('input[name="portfolio"]').fill('https://example.com:bad');
+  await page.locator('form button[type=submit]').click();
+  await expect(page.getByRole('alert').filter({hasText:/tautan/})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Show Your Experience'})).toBeVisible();
 });
 test('homepage reports API failure honestly and exposes retry', async ({page})=> {
   await page.route('**/rest/v1/homepage_content*', route=>route.fulfill({status:503,body:'Unavailable'}));

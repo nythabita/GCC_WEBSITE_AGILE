@@ -1,205 +1,62 @@
-# GCC Website Agile
+# Growth Consulting Club — GCC Website Agile
 
-Website Growth Consulting Club (GCC) untuk memperkenalkan komunitas dan perjalanan mahasiswa melalui **Discover → Learn → Apply → Grow**.
+React/TypeScript/Vite frontend dengan backend Supabase untuk akun, profil, konten homepage, serta pengajuan dan jawaban asesmen GrowthCamp, GrowthX, dan GrowthConnect.
 
-README ini menjelaskan struktur dan implementasi yang tersedia di repository saat ini.
+## Status dan lingkup
 
-## Teknologi
+- Route publik tersedia untuk Home, Discover, Assessment (pemilih program), Learn, Apply, Grow, katalog, dan detail ketiga program.
+- Homepage mengambil konten Hero/About/judul program dan CTA dari Data API; loading/error/retry ditampilkan jika API belum tersedia. Foto, kartu program, FAQ, mentor dan kolaborasi tetap dari data statis.
+- Login minimum menggunakan Google melalui Supabase Auth, tidak lagi kode demo. Google membutuhkan OAuth Client dan redirect yang benar. Tombol Google hanya diaktifkan setelah konfigurasi siap; SMTP/email OTP ditunda sesuai keputusan tim.
+- Ketiga form memerlukan session login. Jawaban dikirim ke database; konfirmasi membutuhkan receipt dari server. Satu user hanya dapat mengajukan sekali per program dan tidak dapat mengedit pengajuan terkirim.
+- Jawaban form merupakan data asesmen kesiapan/pengajuan, tanpa skor otomatis atau keputusan penerimaan yang belum disepakati tim.
+- RLS membatasi profil dan pengajuan ke pemiliknya; browser tidak dapat menentukan user pemilik lain, timestamp, versi, atau ID pengajuan.
+- Kesiapan publik juga memerlukan migration hosted, Google OAuth, URL produksi, dan pengujian akun nyata. Lulus pengujian lokal tidak otomatis berarti layanan sudah siap dipakai publik.
 
-- **Frontend:** React 19, TypeScript, Vite 8.
-- **Styling:** Tailwind CSS 4 melalui plugin Vite, dengan token dan class bersama di `src/styles/global.css`.
-- **Routing:** React Router 8 menggunakan `BrowserRouter`.
-- **Ikon:** Lucide React.
-- **Backend konten:** schema PostgreSQL/Supabase, script Node.js, dan kontrak TypeScript bersama. Tidak ada custom HTTP server di repository ini.
-- **Pemeriksaan kode:** TypeScript dan Oxlint; pengujian backend menggunakan Node Test Runner dan PGlite.
+## Menjalankan
 
-## Status implementasi
+Node.js **24.12+**, npm:
 
-- Homepage sudah terhubung ke route `/` dan menampilkan Hero, About, serta journey Learn/Apply/Grow.
-- Konten homepage berasal dari draft lokal `src/data/homepage-draft.ts`. Statusnya `example`, sehingga halaman menampilkan pemberitahuan draft.
-- Halaman Learn, Apply, dan Grow masih berupa preview/Coming Soon.
-- Navbar tersedia untuk desktop dan mobile. File `footer.tsx` masih kosong dan belum dirender.
-- Fondasi backend konten tersedia di `backend/`, tetapi frontend belum melakukan fetch Supabase.
-- Login, registrasi, assessment, dan detail program penuh belum diimplementasikan.
-- CommunityGallery, StartingPoint, dan TrackRecord masih berupa rencana yang dicatat dalam komentar homepage, belum berupa komponen aktif.
-
-## Struktur repository
-
-```text
-GCC_WEBSITE_AGILE/
-├── public/                         # Aset statis yang disajikan langsung
-│   ├── favicon.svg
-│   └── icons.svg
-├── src/
-│   ├── assets/
-│   │   └── brand/                  # Aset brand dan index ekspornya
-│   ├── components/
-│   │   ├── home/                   # Section dan kartu homepage
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── AboutSection.tsx
-│   │   │   ├── ProgramsSection.tsx # Journey Learn/Apply/Grow
-│   │   │   ├── ProgramCard.tsx
-│   │   │   └── README.md           # Catatan implementasi homepage
-│   │   ├── layout/
-│   │   │   ├── navbar.tsx          # Navigasi bersama desktop/mobile
-│   │   │   ├── PreviewPage.tsx     # Layout halaman preview
-│   │   │   └── footer.tsx          # File kosong, belum dipakai
-│   │   └── UI/
-│   │       ├── button.tsx          # Komponen Button reusable
-│   │       └── button-styles.ts    # Helper style button dan link
-│   ├── data/
-│   │   ├── navigation.ts          # Label dan path navigasi
-│   │   └── homepage-draft.ts      # Konten lokal yang dipakai homepage
-│   ├── pages/
-│   │   ├── HomePage.tsx           # Merangkai section homepage
-│   │   ├── LearnPage.tsx
-│   │   ├── ApplyPage.tsx
-│   │   └── GrowPage.tsx
-│   ├── styles/
-│   │   └── global.css            # Tailwind, token brand, dan style aktif
-│   ├── App.tsx                   # Navbar dan definisi route
-│   ├── main.tsx                  # Entry React, router, dan import CSS aktif
-│   ├── App.css                   # Sisa starter, tidak diimpor entry aktif
-│   └── index.css                 # Sisa starter, tidak diimpor entry aktif
-├── shared/
-│   └── homepage.ts               # Tipe HomepageContent untuk frontend/backend
-├── backend/
-│   ├── schema.sql                # Schema, validasi database, dan akses publik
-│   ├── content.ts                # Validasi kontrak konten
-│   ├── update.ts                 # Validasi/publikasi dokumen homepage
-│   ├── smoke.ts                  # Pemeriksaan akses API hosted
-│   ├── homepage.example.json     # Contoh lengkap konten homepage
-│   ├── *.test.ts                 # Pengujian konten, SQL, update, dan smoke
-│   ├── .env.example              # Template environment script backend
-│   ├── frontend.env.example      # Template untuk integrasi frontend mendatang
-│   ├── package.json              # Dependency dan script backend terpisah
-│   ├── package-lock.json
-│   ├── tsconfig.json
-│   ├── README.md                 # Setup dan kontrak backend terperinci
-│   └── DEPLOYMENT.md             # Catatan deployment backend
-├── docs/
-│   ├── design.md                 # Panduan brand dan desain
-│   ├── dev-a-brief.md            # Brief/handoff pekerjaan homepage
-│   ├── fonts/                    # Referensi font dan status penggunaannya
-│   └── *.png                     # Referensi visual GCC
-├── index.html                    # Dokumen HTML dan mount point React
-├── package.json                  # Dependency dan script frontend
-├── package-lock.json
-├── vite.config.ts                # Plugin React dan Tailwind
-├── tsconfig.json                 # Referensi konfigurasi TypeScript
-├── tsconfig.app.json             # Konfigurasi TypeScript aplikasi
-├── tsconfig.node.json            # Konfigurasi TypeScript tooling
-└── README.md
-```
-
-Gunakan kapitalisasi path sesuai file aslinya, khususnya `components/UI/`, `navbar.tsx`, dan `footer.tsx`, agar import tetap bekerja pada filesystem yang case-sensitive.
-
-## Alur aplikasi dan data
-
-```text
-index.html
-  → src/main.tsx (StrictMode + BrowserRouter + global.css)
-    → src/App.tsx
-      ├── Navbar ← data/navigation.ts
-      └── Routes
-        ├── /       → HomePage ← data/homepage-draft.ts
-        │             ├── HeroSection
-        │             ├── AboutSection
-        │             └── ProgramsSection → ProgramCard
-        ├── /learn  → LearnPage → PreviewPage
-        ├── /apply  → ApplyPage → PreviewPage
-        └── /grow   → GrowPage  → PreviewPage
-```
-
-`HomePage` menerima props `content` bertipe `HomepageContent` dari `shared/homepage.ts`. Konten dibagi menjadi `hero`, `about`, dan `journey`, lalu diteruskan ke section masing-masing. CTA **Explore GCC** menuju anchor `#journey` pada `ProgramsSection`.
-
-Tipe bersama juga digunakan backend. Frontend tidak perlu mengimpor script Node.js dari `backend/`. Saat ini belum ada API loader, loading state API, atau error/retry API di frontend.
-
-## Routing
-
-| Label | Path | Implementasi saat ini |
-| --- | --- | --- |
-| Discover | `/` | Homepage dengan konten draft lokal |
-| Learn | `/learn` | Halaman preview |
-| Apply | `/apply` | Halaman preview |
-| Grow | `/grow` | Halaman preview |
-| Fallback | `*` | Merender homepage; belum ada halaman 404 khusus |
-
-Hosting harus mendukung fallback route aplikasi ke `index.html` agar direct URL dan refresh `/learn`, `/apply`, dan `/grow` bekerja dengan `BrowserRouter`.
-
-## Menjalankan frontend
-
-Gunakan **Node.js 24.12+** agar dapat menjalankan frontend dan script backend dalam satu environment, serta npm.
-
-Dari root repository:
-
-```bash
+```sh
 npm ci
+npm --prefix backend ci
+```
+
+Salin `.env.example` menjadi `.env.local`; hanya URL dan publishable key boleh ada di environment frontend.
+
+```sh
 npm run dev
-```
-
-Buka URL yang ditampilkan Vite di terminal. Frontend saat ini dapat berjalan tanpa environment variable karena menggunakan draft lokal.
-
-| Command | Fungsi |
-| --- | --- |
-| `npm ci` | Menginstal dependency berdasarkan lockfile |
-| `npm run dev` | Menjalankan development server dengan HMR |
-| `npm run build` | Memeriksa TypeScript dan menghasilkan build di `dist/` |
-| `npm run lint` | Menjalankan Oxlint |
-| `npm run preview` | Menyajikan hasil build lokal; jalankan build dahulu |
-
-Root belum menyediakan script `npm test` atau suite pengujian browser otomatis.
-
-## Backend konten homepage
-
-Folder `backend/` memiliki dependency dan lockfile sendiri. Untuk pemeriksaan lokal:
-
-```bash
-cd backend
-npm ci
 npm test
-npm run check
-npm run content:validate
+npm run check:backend
+npm run lint
+npm run build
+npx playwright install chromium
+npm run test:browser
 ```
 
-`content:validate` memvalidasi `homepage.example.json` tanpa memublikasikannya. Pengujian lokal tidak membuktikan API hosted sudah berjalan.
+`npm test` menjalankan suite backend, validasi kontrak dan PostgreSQL melalui PGlite. `test:browser` menguji alur UI dengan session/provider/HTTP fixture; pengiriman email dan OAuth nyata tetap harus diuji terpisah. Pada Windows pengujian memakai Chrome terpasang, sistem lain memakai Chromium Playwright.
 
-Kontrak v1 mencakup `schemaVersion`, `contentStatus`, `notice`, `hero`, `about`, dan tiga item `journey` berurutan: Learn, Apply, Grow. Konten dengan status `example` harus menampilkan `notice`.
+## Struktur utama
 
-Endpoint baca yang disiapkan backend:
-
-```http
-GET /rest/v1/homepage_content?id=eq.home&select=id,content,updated_at
-apikey: <publishable-key>
-```
-
-Template `backend/frontend.env.example` menyediakan nama `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` untuk integrasi mendatang; aplikasi saat ini belum membacanya. Secret key hanya untuk script backend tepercaya dan tidak boleh dimasukkan ke variabel `VITE_*`.
-
-Untuk setup database, environment, publikasi konten, dan smoke check hosted, ikuti [panduan backend](backend/README.md). Lihat juga [catatan deployment](backend/DEPLOYMENT.md). Saat integrasi API dilakukan, tangani loading, respons kosong/tidak valid, serta error/retry secara eksplisit.
-
-## Panduan perubahan
-
-| Kebutuhan | Lokasi utama |
+| Lokasi | Tanggung jawab |
 | --- | --- |
-| Mengubah teks draft homepage | `src/data/homepage-draft.ts` |
-| Mengubah susunan homepage | `src/pages/HomePage.tsx` |
-| Mengubah tampilan section homepage | `src/components/home/` |
-| Menambah route | `src/App.tsx` dan halaman di `src/pages/` |
-| Mengubah menu navigasi | `src/data/navigation.ts` dan `src/components/layout/navbar.tsx` |
-| Mengubah warna, tipografi, atau spacing bersama | `src/styles/global.css` |
-| Mengubah Button bersama | `src/components/UI/` |
-| Mengubah kontrak data homepage | `shared/homepage.ts`, validator/schema backend, dan konsumen terkait |
-| Mengubah konten yang akan dipublikasikan ke backend | File JSON sesuai panduan `backend/README.md` |
+| `src/pages/`, `src/components/` | Halaman dan tampilan |
+| `src/data/` | Konten statis serta konfigurasi form |
+| `src/auth/` | Session dan pembatasan route form |
+| `src/lib/` | Client Supabase dan transport Data API |
+| `shared/forms.ts`, `shared/form-types.ts` | Kontrak dan validasi form yang dipakai lintas frontend/backend |
+| `shared/homepage.ts`, `shared/homepage-validation.ts` | Kontrak konten homepage v1/v2 |
+| `backend/` | Schema, generator aturan, maintenance konten dan pengujian PostgreSQL |
+| `tests/` | Pengujian browser |
+| `docs/` | Referensi desain dan panduan handoff |
 
-Gunakan aset aplikasi dari `src/assets/brand/`; file dalam `docs/` merupakan referensi dan tidak otomatis tersedia sebagai URL produksi. Status sumber dan penggunaan font dijelaskan di [docs/fonts/README.md](docs/fonts/README.md).
+Pertahankan kapitalisasi path, termasuk `components/UI/`, agar import bekerja di Linux. Entry CSS aktif adalah `src/styles/global.css`. Hosting harus menerapkan fallback SPA (`vercel.json` sudah tersedia).
 
-Sebelum menggabungkan perubahan frontend, jalankan `npm run build` dan `npm run lint`. Untuk perubahan backend, jalankan pemeriksaan backend di atas. Lengkapi dengan pengecekan manual layout mobile/desktop, menu mobile, navigasi, anchor journey, keyboard focus, dan refresh route pada hosting.
+## Dokumentasi
 
-## Dokumentasi terkait
+- [Setup backend, SMTP, OAuth dan release checks](docs/BACKEND_SETUP.md)
+- [Status deployment dan batas verifikasi](backend/DEPLOYMENT.md)
+- [Maintenance database/konten](backend/README.md)
+- [Desain dan brand](docs/design.md)
+- [Brief homepage awal](docs/dev-a-brief.md)
 
-- [Panduan desain](docs/design.md)
-- [Brief pengembangan homepage](docs/dev-a-brief.md)
-- [Catatan struktur homepage](src/components/home/README.md)
-- [Sumber dan status font](docs/fonts/README.md)
-- [Setup dan kontrak backend](backend/README.md)
-- [Catatan deployment backend](backend/DEPLOYMENT.md)
+Catatan historis `docs/HANDOFF.md`, `docs/PROGRESS.md` dan QA simulasi lama menggambarkan keadaan sebelum integrasi backend; gunakan panduan setup dan deployment di atas untuk status backend saat ini. Jangan menambahkan pembayaran, scoring, unggah file, atau panel admin tanpa scope yang disepakati.

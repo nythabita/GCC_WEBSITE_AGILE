@@ -39,6 +39,11 @@ test('Postgres enforces private immutable submissions, validation, owner default
       { ...fixtures.growthcamp, contact: 'not-email' }, { ...fixtures.growthcamp, name: 'x'.repeat(10001) },
       { ...fixtures.growthcamp, owner: owner }, { ...fixtures.growthcamp, name: '\t\n' } ];
     for (const answers of bad) await assert.rejects(db.query('INSERT INTO public.program_applications(program_slug,answers) VALUES($1,$2)', ['growthcamp',answers]), /check constraint/);
+    for (const [slug, answers] of [
+      ['growthconnect', {...fixtures.growthconnect, budget:'Belum tersedia',budgetRange:{forged:'x'}}],
+      ['growthcamp', {...fixtures.growthcamp,experienceDetail:'x'.repeat(20000)}],
+      ['growthx', {...fixtures.growthx,portfolio:'https://example.com:bad'}],
+    ] as const) await assert.rejects(db.query('INSERT INTO public.program_applications(program_slug,answers) VALUES($1,$2)',[slug,answers]),/check constraint/);
     await db.exec('RESET ROLE'); await db.exec(buildFormSchema()); await db.exec(accounts);
     assert.equal((await db.query('SELECT * FROM public.program_applications')).rows.length, 3, 'rerun preserves submissions');
     await db.query('DELETE FROM auth.users WHERE id=$1', [owner]);

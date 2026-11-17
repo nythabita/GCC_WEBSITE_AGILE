@@ -5,7 +5,7 @@ import { buttonStyles } from "../UI/button-styles";
 import { BackLink, Eyebrow, PageContainer } from "../content/blocks";
 import type { Answers, CheckboxesField, Field, FormConfig, FormStep, MatrixField, TextareaField, TextField } from "./types";
 import { useAuth } from "../../auth/AuthContext";
-import { isProgramSlug, validateAnswers, normalizeAnswers } from "../../../shared/forms";
+import { isProgramSlug, validateAnswers, validateStep, normalizeAnswers } from "../../../shared/forms";
 import type { ApplicationReceipt } from "../../lib/gcc-api";
 
 // Config-driven multi-step form (see ./types.ts). Mobile-first, one column; desktop keeps a centred 2xl column.
@@ -31,11 +31,6 @@ function isVisible(field: Field, answers: Answers) {
   return Array.isArray(value) ? value.includes(field.showIf.equals) : value === field.showIf.equals;
 }
 
-function isRequired(field: Field, answers: Answers) {
-  if (field.requiredWhen) return asList(answers[field.requiredWhen.field]).some((item) => item !== field.requiredWhen!.anyBut);
-  return Boolean(field.required);
-}
-
 const marksRequired = (field: Field) => Boolean(field.required || field.requiredWhen);
 
 function resolveText(field: TextField, answers: Answers) {
@@ -55,32 +50,6 @@ function isAnswered(field: Flat, answers: Answers): boolean {
   }
 }
 
-// Returns an error message per field id (perSelection uses `${id}.0` / `${id}.1`).
-function validate(fields: Field[], answers: Answers): Record<string, string> {
-  const errors: Record<string, string> = {};
-  for (const field of flatten(fields)) {
-    if (field.type === "note" || !isVisible(field, answers)) continue;
-    const required = isRequired(field, answers);
-    if (field.type === "perSelection") {
-      if (required && !asText(answers[`${field.id}.0`]).trim()) errors[`${field.id}.0`] = "Wajib diisi.";
-      if (asList(answers[field.from]).length >= 2 && !asText(answers[`${field.id}.1`]).trim()) errors[`${field.id}.1`] = "Wajib diisi.";
-      continue;
-    }
-    if (required && !isAnswered(field, answers)) {
-      errors[field.id] = field.type === "consent" ? "Centang untuk melanjutkan." : field.type === "checkboxes" ? "Pilih minimal satu." : field.type === "matrix" || field.type === "radio" ? "Pilih satu jawaban." : "Wajib diisi.";
-      continue;
-    }
-    const text = asText(answers[field.id]).trim();
-    if (field.type === "textarea" && field.maxWords && countWords(text) > field.maxWords) errors[field.id] = `Maksimal ${field.maxWords} kata.`;
-    if (field.type === "text" && text) {
-      const mode = resolveText(field, answers).inputMode;
-      if (mode === "email" && !/^\S+@\S+\.\S+$/.test(text)) errors[field.id] = "Tulis alamat email yang valid.";
-      if (mode === "tel" && !/^[+0-9][0-9\s-]{7,}$/.test(text)) errors[field.id] = "Tulis nomor WhatsApp yang valid.";
-      if (mode === "url" && !/^https?:\/\/\S+$/.test(text)) errors[field.id] = "Tulis tautan lengkap, diawali https://.";
-    }
-  }
-  return errors;
-}
 
 function FieldBlock({ id, label, required, hint, error, children, as = "label", sub = false }: { id: string; label: string; required?: boolean; hint?: string; error?: string; children: ReactNode; as?: "label" | "legend"; sub?: boolean }) {
   const text = <>{label}{required ? " *" : ""}</>;
@@ -335,7 +304,6 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const first = useRef(true);
   const reviewIndex = config.steps.length;
-  const doneIndex = reviewIndex + 1;
   const labels = useMemo(() => [...config.steps.map((step) => step.label), "Tinjau"], [config.steps]);
 
   useEffect(() => {
@@ -373,7 +341,7 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
   const goNext = () => {
     const step = stepAt(stage);
     if (!step) return;
-    const found = validate(step.fields, answers);
+    const found = validateStep(config.slug, step.fields, answers);
     setErrors(found);
     const key = Object.keys(found)[0];
     if (key) {
@@ -391,10 +359,10 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
     const fields = allFields.filter((field) => item.fields.includes(field.id) && isVisible(field, answers));
     const hasError = item.fields.some((id) => Object.keys(merged).some((key) => key === id || key.startsWith(`${id}.`)));
     const done = item.optional ? fields.some((field) => isAnswered(field, answers)) : !hasError;
-    return done ? "terisi" : "belum diisi";
+    return hasError ? "perlu diperbaiki" : done ? "terisi" : "belum diisi";
   };
 
-  const head = stage === reviewIndex ? { title: config.review.title as string | [string, string], description: config.review.description } : stage === doneIndex ? { title: config.done.title as string | [string, string], description: config.done.description } : stepAt(stage)!;
+  const head = stage === reviewIndex ? { title: config.review.title as string | [string, string], description: config.review.description } : stepAt(stage)!;
   const title = Array.isArray(head.title) ? head.title : [head.title];
   const prevLabel = stage === 0 ? config.startBackLabel ?? config.backLabel : (stage < reviewIndex ? stepAt(stage)!.backLabel : undefined) ?? `Kembali ke ${labels[stage - 1]}`;
   const footNote = "Periksa jawaban sebelum melanjutkan. Tombol Kembali mempertahankan isian selama formulir terbuka.";
@@ -415,7 +383,7 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
   if (requestError && stage === 0) return <main className="page-container py-16"><h1 className="font-display text-3xl">Pengajuan {config.programName}</h1><p role="alert" className="mt-4">{requestError}</p><button type="button" onClick={() => {setChecking(true);setRequestError('');setRetry(x => x + 1);}} className={`${outlineButton} mt-5`}>Coba lagi</button></main>;
 
   return (
-    <main className={`${stage === doneIndex ? "bg-white" : "bg-[#f3faf8]"} pb-12 pt-[33px] tracking-[0.02em] md:pb-20`}>
+    <main className="bg-[#f3faf8] pb-12 pt-[33px] tracking-[0.02em] md:pb-20">
       <PageContainer className="md:max-w-2xl">
         <BackLink to={config.backTo}>{config.backLabel}</BackLink>
         <Eyebrow className="mt-5">{config.eyebrow}</Eyebrow>
@@ -432,11 +400,12 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
         </h1>
         <p className="-mr-2.5 mt-3 text-base font-semibold leading-6 text-forest md:mr-0">{head.description}</p>
 
-        {stage < doneIndex && <Progress labels={labels} current={stage} />}
-        {stage < doneIndex && <p className="mt-8 text-[13px] font-semibold text-forest">Tanda * menunjukkan pertanyaan wajib.</p>}
+        <Progress labels={labels} current={stage} />
+        <p className="mt-8 text-[13px] font-semibold text-forest">Tanda * menunjukkan pertanyaan wajib.</p>
 
         {stage < reviewIndex && (
           <form noValidate onSubmit={(event) => { event.preventDefault(); goNext(); }}>
+            {errors._form && <p role="alert" className="mt-5 text-sm text-berry">{errors._form}</p>}
             {stepAt(stage)!.fields.map((field) => <FieldView key={field.id} field={field} answers={answers} set={set} errors={errors} />)}
             <div className="mt-10 flex flex-col gap-3">
               <button type="submit" className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>
@@ -494,20 +463,6 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
           </div>
         )}
 
-        {stage === doneIndex && (
-          <div className="mt-8 md:max-w-md">
-            {config.done.card && (
-              <div className="mb-8 rounded-2xl bg-[#f3faf8] p-5 text-forest">
-                <p className="font-display text-[26px] font-bold leading-[1.15] tracking-normal">{config.done.card.title}</p>
-                <p className="mt-4 text-base font-semibold leading-6">{config.done.card.text}</p>
-              </div>
-            )}
-            <div className="flex flex-col gap-3">
-              <Link to={config.backTo} className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>{config.done.backLabel}{arrow}</Link>
-              <Link to={config.done.exploreTo} className={outlineButton}>{config.done.exploreLabel}{arrow}</Link>
-            </div>
-          </div>
-        )}
       </PageContainer>
     </main>
   );

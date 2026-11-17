@@ -52,7 +52,7 @@ export function normalizeAnswers(slug: ProgramSlug, answers: Answers): Answers {
   for (const rule of rules[slug]) {
     if (!active(rule, answers)) continue;
     const v = answers[rule.id];
-    if (typeof v === 'string' && v.trim()) result[rule.id] = v.trim();
+    if (typeof v === 'string' && v.trim()) result[rule.id] = rule.mode === 'url' ? new URL(v.trim()).href : v.trim();
     else if (Array.isArray(v) && v.length) result[rule.id] = [...v];
   }
   return result;
@@ -80,10 +80,18 @@ export function validateAnswers(slug: string, input: unknown): Record<string, st
       if (rule.options && !rule.options.includes(text)) errors[rule.id] = 'Pilihan tidak valid.';
       if (rule.maxWords && text.split(/\s+/u).filter(Boolean).length > rule.maxWords) errors[rule.id] = `Maksimal ${rule.maxWords} kata.`;
       const mode = rule.dynamic ? rule.dynamic.modes[String(answers[rule.dynamic.by])] : rule.mode;
-      if (mode === 'email' && !/^\S+@\S+\.\S+$/u.test(text)) errors[rule.id] = 'Tulis alamat email yang valid.';
+      if (mode === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(text)) errors[rule.id] = 'Tulis alamat email yang valid.';
       if (mode === 'tel' && !/^[+0-9][0-9\s-]{7,}$/u.test(text)) errors[rule.id] = 'Tulis nomor WhatsApp yang valid.';
       if (mode === 'url') { try { const url = new URL(text); if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) errors[rule.id] = 'Tulis tautan http/https yang valid.'; } catch { errors[rule.id] = 'Tulis tautan http/https yang valid.'; } }
     }
   }
+  return errors;
+}
+
+export function validateStep(slug: string, fields: Field[], answers: Answers): Record<string, string> {
+  const all = validateAnswers(slug, answers);
+  const ids = new Set(fields.flatMap(rulesFor).map(rule => rule.id));
+  const errors = Object.fromEntries(Object.entries(all).filter(([id]) => id === '_form' || ids.has(id)));
+  for (const field of fields) if (field.type === 'matrix' && Object.keys(errors).some(key => key.startsWith(`${field.id}.`))) errors[field.id] = 'Pilih satu jawaban pada setiap baris.';
   return errors;
 }
