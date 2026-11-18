@@ -15,7 +15,10 @@ export default function LoginPage() {
   try { storedNext = sessionStorage.getItem('gcc.auth.returnTo'); } catch { /* Default to home when storage is unavailable. */ }
   const next = safeReturnTo(new URLSearchParams(location.search).get('next') ?? storedNext);
   const [error,setError] = useState(''); const [busy,setBusy] = useState(false); const pending = useRef(false);
-  const callbackError = new URLSearchParams(location.search).has('error') || new URLSearchParams(location.hash.slice(1)).has('error');
+  const query = new URLSearchParams(location.search);
+  const callbackError = query.has('error') ||
+    new URLSearchParams(location.hash.slice(1)).has('error') ||
+    (query.has('code') && !loading && !session);
   const enabled = import.meta.env.VITE_GOOGLE_AUTH_ENABLED === 'true';
   const login = async()=> {
     if(pending.current || !services || !enabled) return;

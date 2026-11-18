@@ -12,10 +12,10 @@ Migration `gcc_homepage_content_v1` was applied. Hosted public read, denied publ
 
 ## Current integration (18 November 2026)
 
-- Restore of the paused project was requested successfully; last observed project status is `RESTORING`.
-- New account/application schemas and homepage v2 are implemented and tested locally, **not yet applied hosted** while restoration is pending.
+- The original hosted project reports `RESTORE_FAILED`. Supabase rejected a second restore request and could not list its tables.
+- The account/application schemas and homepage v2 are implemented and tested locally. Applying them requires an accessible hosted database.
 - Local backend suite: 44 passed; includes real PostgreSQL grants/RLS, validation, private owner defaults, duplicate constraint and cascade checks through PGlite.
-- Browser suite: 9 passed, covering auth guard, Google-only minimum login, field diagnostics, three forms' failed/success/reload receipt flows, logout and contribution-answer alignment. Auth/provider/HTTP are fixtures, not real Google authorization.
+- Browser suite: 12 passed. Covers the auth guard, Google PKCE redirect and code exchange, callback failure, homepage API rendering, three form submission flows, and logout against fixture responses. Hosted Google authorization must be verified separately.
 - Backend TypeScript, root TypeScript/production build and lint passed. Production build has a large-chunk warning.
 - npm audit reports the pre-existing `picomatch` advisory through Vite's build tooling; no patched version listed when reviewed. See setup notes. Audit is **not clean**.
 - User chose Google-only bare minimum: SMTP/email OTP are deferred. Google OAuth and final frontend URL are not configured/verified yet. Google button is gated by `VITE_GOOGLE_AUTH_ENABLED` until setup is complete.

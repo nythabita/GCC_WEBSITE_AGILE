@@ -1,13 +1,27 @@
 import { test, expect, type Page } from '@playwright/test';
+import homepage from '../backend/homepage.v2.json' with { type: 'json' };
 
 const owner = '11111111-1111-4111-8111-111111111111';
 const savedId = '33333333-3333-4333-8333-333333333333';
-async function signInFixture(page: Page) {
+function sessionFixture() {
   const expiry = Math.floor(Date.now()/1000)+3600;
   const token = `${Buffer.from('{"alg":"HS256","typ":"JWT"}').toString('base64url')}.${Buffer.from(JSON.stringify({sub:owner,role:'authenticated',aud:'authenticated',exp:expiry})).toString('base64url')}.test-signature`;
-  const user = {id:owner,email:'tester@example.com',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email',providers:['email']},user_metadata:{full_name:'Test Student'},created_at:'2026-11-18T00:00:00Z',email_confirmed_at:'2026-11-18T00:00:00Z',is_anonymous:false};
-  await page.addInitScript(({token,expiry,user})=>{ if(sessionStorage.getItem('fixture-seeded'))return;sessionStorage.setItem('fixture-seeded','yes');localStorage.setItem('sb-svyulvjezdzgooywntyl-auth-token',JSON.stringify({access_token:token,refresh_token:'test-refresh-token',expires_in:3600,expires_at:expiry,token_type:'bearer',user})); },{token,expiry,user});
+  const user = {id:owner,email:'tester@example.com',aud:'authenticated',role:'authenticated',app_metadata:{provider:'google',providers:['google']},user_metadata:{full_name:'Test Student'},created_at:'2026-11-18T00:00:00Z',email_confirmed_at:'2026-11-18T00:00:00Z',is_anonymous:false};
+  return { access_token: token, refresh_token: 'test-refresh-token', expires_in: 3600, expires_at: expiry, token_type: 'bearer', user };
 }
+
+async function signInFixture(page: Page) {
+  await page.addInitScript((session) => {
+    if (sessionStorage.getItem('fixture-seeded')) return;
+    sessionStorage.setItem('fixture-seeded', 'yes');
+    localStorage.setItem('sb-gcc-test-auth-token', JSON.stringify(session));
+  }, sessionFixture());
+}
+
+test.beforeEach(async ({ page }) => {
+  // A missing route mock must never call a hosted Supabase endpoint.
+  await page.route('https://gcc-test.supabase.co/**', (route) => route.abort());
+});
 
 async function completeForm(page: Page, steps = 4) {
   await expect(page.locator('form')).toBeVisible();
@@ -40,6 +54,37 @@ test('minimum login offers Google only and never exposes the deferred OTP form',
   await expect(page.getByRole('button',{name:'Create Account',exact:true})).toHaveCount(0);
   await expect(page.getByText('You’re signed in',{exact:true})).toHaveCount(0);
 });
+test('Google redirect exchanges the code and returns to the protected form', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.route('**/auth/v1/authorize?*', async (route) => {
+    const request = new URL(route.request().url());
+    expect(request.searchParams.get('provider')).toBe('google');
+    expect(request.searchParams.get('code_challenge')).toBeTruthy();
+    const redirect = new URL(request.searchParams.get('redirect_to')!);
+    expect(redirect.pathname).toBe('/login');
+    redirect.searchParams.set('code', 'gcc-test-code');
+    await route.fulfill({ status: 302, headers: { location: redirect.href } });
+  });
+  await page.route('**/auth/v1/token?grant_type=pkce', async (route) => {
+    const payload = route.request().postDataJSON();
+    expect(payload.auth_code).toBe('gcc-test-code');
+    expect(payload.code_verifier).toBeTruthy();
+    await route.fulfill({ json: sessionFixture() });
+  });
+  await page.route('**/rest/v1/program_applications?*', (route) => route.fulfill({ json: [] }));
+  await page.goto('/apply/growthx/form');
+  await page.getByRole('button', { name: 'Continue with Google' }).click();
+  await expect(page.getByRole('heading', { name: 'You’re signed in' })).toBeVisible();
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(page).toHaveURL(/\/apply\/growthx\/form$/);
+  await expect(page.locator('form')).toBeVisible();
+});
+
+test('a callback code without a session explains how to retry', async ({ page }) => {
+  await page.goto('/login?code=expired-test-code');
+  await expect(page.getByRole('alert')).toContainText('Login Google belum berhasil');
+  await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled();
+});
 test('invalid URL shows an actionable field error before advancing to review', async({page})=> {
   await signInFixture(page); await page.route('**/rest/v1/program_applications*',route=>route.fulfill({status:200,contentType:'application/json',body:'[]'}));
   await page.goto('/apply/growthx/form'); await completeForm(page,2);
@@ -54,6 +99,17 @@ test('homepage reports API failure honestly and exposes retry', async ({page})=>
   await page.goto('/');
   await expect(page.getByRole('button',{name:'Coba lagi',exact:true})).toBeVisible();
   await expect(page.getByRole('alert')).toBeVisible();
+});
+
+test('homepage reads the current hero, about, and calls to action from the API', async ({ page }) => {
+  await page.route('**/rest/v1/homepage_content*', (route) => route.fulfill({
+    json: [{ id: 'home', content: homepage, updated_at: '2026-11-18T00:00:00Z' }],
+  }));
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Think Structurally/);
+  await expect(page.getByRole('heading', { name: homepage.about.title })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Explore Our Programs', exact: true }).first()).toHaveAttribute('href', '/programs');
+  await expect(page.getByRole('link', { name: 'Find Your Starting Point', exact: true }).first()).toHaveAttribute('href', '/assessment');
 });
 
 for(const [slug,path] of [['growthcamp','/learn/growthcamp/form'],['growthx','/apply/growthx/form'],['growthconnect','/apply/growthconnect/form']] as const) {
