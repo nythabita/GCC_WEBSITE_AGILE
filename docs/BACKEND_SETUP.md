@@ -31,9 +31,9 @@ Pengujian browser memakai Chrome terpasang di Windows dan Chromium Playwright di
 
 ## Menerapkan database
 
-Project awal `gcc-homepage` (`svyulvjezdzgooywntyl`) di Singapore berstatus `RESTORE_FAILED` pada pemeriksaan 18 November 2026. Jalankan migration ketika project tujuan berstatus `ACTIVE_HEALTHY`. Jika memakai project pengganti, ambil URL dan publishable key dari project itu serta gunakan ref baru di langkah OAuth di bawah.
+Project aktif untuk frontend adalah [`gcc-backend`](https://supabase.com/dashboard/project/xeuvlchtvbepatktxwet) (Free, Singapore). Schema dan seed dari Git sudah diterapkan. Project awal `gcc-homepage` berstatus `RESTORE_FAILED` dan datanya belum bisa disalin.
 
-Terapkan sebagai pengelola, dengan urutan:
+Untuk menyiapkan environment lain, terapkan sebagai pengelola dengan urutan:
 
 1. `backend/schema.sql`: homepage v1/v2, mempertahankan record lama.
 2. `backend/forms.generated.sql`: metadata validasi tiga form.
@@ -46,7 +46,7 @@ Simpan setiap penerapan dalam migration history Supabase. Pada deployment melalu
 
 ## Kontrak Data API
 
-Semua URL berada di `https://svyulvjezdzgooywntyl.supabase.co/rest/v1`.
+Semua URL berada di `https://xeuvlchtvbepatktxwet.supabase.co/rest/v1`.
 
 | Operasi | Request | Izin |
 | --- | --- | --- |
@@ -71,10 +71,10 @@ Sesuai keputusan terbaru pengguna, email/OTP dan SMTP ditunda. Akun dibuat otoma
 ## Google OAuth dan URL aplikasi
 
 1. Di Google Cloud, siapkan project/consent screen untuk GCC dan OAuth Client jenis Web Application. Gunakan scope dasar login; jangan meminta akses Gmail.
-2. Isi Authorized redirect URI di Google dengan callback project tujuan, yaitu URL project Supabase diikuti `/auth/v1/callback`. Salin URL callback yang ditampilkan di Supabase Auth → Providers → Google.
-3. Masukkan Client ID dan Client Secret langsung ke Supabase Auth → Providers → Google. Secret tidak masuk repository.
+2. Isi Authorized redirect URI di Google dengan `https://xeuvlchtvbepatktxwet.supabase.co/auth/v1/callback`.
+3. Masukkan Client ID dan Client Secret langsung di [Supabase Auth → Providers → Google](https://supabase.com/dashboard/project/xeuvlchtvbepatktxwet/auth/providers). Aktifkan Google dan nonaktifkan Email di daftar provider untuk menjalankan kebijakan Google-only. Simpan secret di dashboard.
 4. Supabase Site URL harus merupakan URL frontend final. Allowlist redirect harus mencakup callback aplikasi `/login` di origin produksi yang tepat. Untuk development, tambahkan `http://127.0.0.1:5173/login` dan/atau `http://localhost:5173/login` sesuai yang digunakan. Jangan memakai wildcard untuk seluruh domain produksi.
-5. Ubah `VITE_GOOGLE_AUTH_ENABLED=true` hanya setelah provider terkonfigurasi. Build/deploy ulang agar flag Vite berlaku.
+5. Setelah provider dan allowlist terkonfigurasi, set `VITE_GOOGLE_AUTH_ENABLED=true` pada environment yang akan diuji. Restart Vite untuk tes lokal. Build/deploy ulang untuk frontend online.
 6. Uji akun Google di luar tim. Pastikan status consent/audience Google mengizinkan pengguna yang dituju; aplikasi dalam mode testing tidak otomatis tersedia untuk semua akun.
 
 Untuk frontend Vercel, deploy branch integrasi ini dan isi environment dari `.env.example` pada project Vercel. Gunakan hasil build `dist/`, bukan dev server Vite publik. URL produksi belum tersedia pada saat rancangan disetujui; jangan menandai setup redirect selesai sebelum URL final benar-benar ada.
