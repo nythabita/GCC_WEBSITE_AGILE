@@ -4,6 +4,9 @@ import { ArrowRight, Info } from "lucide-react";
 import { buttonStyles } from "../UI/button-styles";
 import { BackLink, Eyebrow, PageContainer } from "../content/blocks";
 import type { Answers, CheckboxesField, Field, FormConfig, FormStep, MatrixField, TextareaField, TextField } from "./types";
+import { useAuth } from "../../auth/AuthContext";
+import { isProgramSlug, validateAnswers, validateStep, normalizeAnswers } from "../../../shared/forms";
+import type { ApplicationReceipt } from "../../lib/gcc-api";
 
 // Config-driven multi-step form (see ./types.ts). Mobile-first, one column; desktop keeps a centred 2xl column.
 
@@ -28,11 +31,6 @@ function isVisible(field: Field, answers: Answers) {
   return Array.isArray(value) ? value.includes(field.showIf.equals) : value === field.showIf.equals;
 }
 
-function isRequired(field: Field, answers: Answers) {
-  if (field.requiredWhen) return asList(answers[field.requiredWhen.field]).some((item) => item !== field.requiredWhen!.anyBut);
-  return Boolean(field.required);
-}
-
 const marksRequired = (field: Field) => Boolean(field.required || field.requiredWhen);
 
 function resolveText(field: TextField, answers: Answers) {
@@ -52,32 +50,6 @@ function isAnswered(field: Flat, answers: Answers): boolean {
   }
 }
 
-// Returns an error message per field id (perSelection uses `${id}.0` / `${id}.1`).
-function validate(fields: Field[], answers: Answers): Record<string, string> {
-  const errors: Record<string, string> = {};
-  for (const field of flatten(fields)) {
-    if (field.type === "note" || !isVisible(field, answers)) continue;
-    const required = isRequired(field, answers);
-    if (field.type === "perSelection") {
-      if (required && !asText(answers[`${field.id}.0`]).trim()) errors[`${field.id}.0`] = "Wajib diisi.";
-      if (asList(answers[field.from]).length >= 2 && !asText(answers[`${field.id}.1`]).trim()) errors[`${field.id}.1`] = "Wajib diisi.";
-      continue;
-    }
-    if (required && !isAnswered(field, answers)) {
-      errors[field.id] = field.type === "consent" ? "Centang untuk melanjutkan." : field.type === "checkboxes" ? "Pilih minimal satu." : field.type === "matrix" || field.type === "radio" ? "Pilih satu jawaban." : "Wajib diisi.";
-      continue;
-    }
-    const text = asText(answers[field.id]).trim();
-    if (field.type === "textarea" && field.maxWords && countWords(text) > field.maxWords) errors[field.id] = `Maksimal ${field.maxWords} kata.`;
-    if (field.type === "text" && text) {
-      const mode = resolveText(field, answers).inputMode;
-      if (mode === "email" && !/^\S+@\S+\.\S+$/.test(text)) errors[field.id] = "Tulis alamat email yang valid.";
-      if (mode === "tel" && !/^[+0-9][0-9\s-]{7,}$/.test(text)) errors[field.id] = "Tulis nomor WhatsApp yang valid.";
-      if (mode === "url" && !/^https?:\/\/\S+$/.test(text)) errors[field.id] = "Tulis tautan lengkap, diawali https://.";
-    }
-  }
-  return errors;
-}
 
 function FieldBlock({ id, label, required, hint, error, children, as = "label", sub = false }: { id: string; label: string; required?: boolean; hint?: string; error?: string; children: ReactNode; as?: "label" | "legend"; sub?: boolean }) {
   const text = <>{label}{required ? " *" : ""}</>;
@@ -304,6 +276,24 @@ function Progress({ labels, current }: { labels: string[]; current: number }) {
 const outlineButton = buttonStyles({ variant: "outline", size: "lg", fullWidth: true, className: "text-[15px]" });
 
 export default function ProgramForm({ config }: { config: FormConfig }) {
+  const { session, services } = useAuth();
+  const [saved, setSaved] = useState<ApplicationReceipt | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [requestError, setRequestError] = useState("");
+  const [retry, setRetry] = useState(0);
+  const [sending, setSending] = useState(false);
+  const submitting = useRef(false);
+  const currentOwner = useRef(session?.user.id);
+  useEffect(() => { currentOwner.current = session?.user.id; return () => {currentOwner.current = undefined;}; }, [session?.user.id]);
+  useEffect(() => {
+    let alive = true;
+    if (!session || !services || !isProgramSlug(config.slug)) return;
+    void services.api.getApplication(config.slug, { userId: session.user.id, accessToken: session.access_token }).then(receipt => {
+      if (alive) {setSaved(receipt);setRequestError("");}
+    }).catch(() => { if (alive) setRequestError("Pengajuan sebelumnya belum dapat diperiksa. Coba lagi sebelum melanjutkan."); })
+      .finally(() => { if (alive) setChecking(false); });
+    return () => { alive = false; };
+  }, [session, services, config.slug, retry]);
   const [stage, setStage] = useState(0); // 0..steps-1 fields, steps = review, steps+1 = done
   const [answers, setAnswers] = useState<Answers>(() => {
     const initial: Answers = {};
@@ -314,7 +304,6 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
   const heading = useRef<HTMLHeadingElement>(null);
   const first = useRef(true);
   const reviewIndex = config.steps.length;
-  const doneIndex = reviewIndex + 1;
   const labels = useMemo(() => [...config.steps.map((step) => step.label), "Tinjau"], [config.steps]);
 
   useEffect(() => {
@@ -327,7 +316,13 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
     setAnswers((prev) => {
       const next = { ...prev, [id]: value };
       // Keep per-selection answers aligned with the chosen options.
-      if (Array.isArray(value)) for (const step of config.steps) for (const field of flatten(step.fields)) if (field.type === "perSelection" && field.from === id && value.length < 2) next[`${field.id}.1`] = "";
+      if (Array.isArray(value)) for (const step of config.steps) for (const field of flatten(step.fields)) if (field.type === "perSelection" && field.from === id) {
+        const before = asList(prev[id]);
+        for (const index of [0, 1]) {
+          const oldIndex = before.indexOf(value[index]);
+          next[`${field.id}.${index}`] = oldIndex >= 0 ? asText(prev[`${field.id}.${oldIndex}`]) : "";
+        }
+      }
       return next;
     });
     setErrors((prev) => {
@@ -340,13 +335,13 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
   };
 
   const stepAt = (index: number): FormStep | undefined => config.steps[index];
-  const merged = useMemo(() => Object.assign({}, ...config.steps.map((step) => validate(step.fields, answers))) as Record<string, string>, [config.steps, answers]);
+  const merged = useMemo(() => validateAnswers(config.slug, answers), [config.slug, answers]);
   const missing = Object.keys(merged).length > 0;
 
   const goNext = () => {
     const step = stepAt(stage);
     if (!step) return;
-    const found = validate(step.fields, answers);
+    const found = validateStep(config.slug, step.fields, answers);
     setErrors(found);
     const key = Object.keys(found)[0];
     if (key) {
@@ -364,17 +359,31 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
     const fields = allFields.filter((field) => item.fields.includes(field.id) && isVisible(field, answers));
     const hasError = item.fields.some((id) => Object.keys(merged).some((key) => key === id || key.startsWith(`${id}.`)));
     const done = item.optional ? fields.some((field) => isAnswered(field, answers)) : !hasError;
-    return done ? "terisi" : "belum diisi";
+    return hasError ? "perlu diperbaiki" : done ? "terisi" : "belum diisi";
   };
 
-  const head = stage === reviewIndex ? { title: config.review.title as string | [string, string], description: config.review.description } : stage === doneIndex ? { title: config.done.title as string | [string, string], description: config.done.description } : stepAt(stage)!;
+  const head = stage === reviewIndex ? { title: config.review.title as string | [string, string], description: config.review.description } : stepAt(stage)!;
   const title = Array.isArray(head.title) ? head.title : [head.title];
   const prevLabel = stage === 0 ? config.startBackLabel ?? config.backLabel : (stage < reviewIndex ? stepAt(stage)!.backLabel : undefined) ?? `Kembali ke ${labels[stage - 1]}`;
   const footNote = "Periksa jawaban sebelum melanjutkan. Tombol Kembali mempertahankan isian selama formulir terbuka.";
   const arrow = <ArrowRight size={16} aria-hidden="true" />;
+  const submit = async () => {
+    if (submitting.current || missing || !session || !services || !isProgramSlug(config.slug)) return;
+    const owner = session.user.id;
+    submitting.current = true; setSending(true); setRequestError("");
+    try {
+      const receipt = await services.api.submitApplication(config.slug, normalizeAnswers(config.slug, answers), { userId: owner, accessToken: session.access_token });
+      if (currentOwner.current === owner) setSaved(receipt);
+    } catch (error) { if (currentOwner.current === owner) setRequestError(error instanceof Error ? error.message : "Pengajuan belum berhasil disimpan. Jawaban tetap ada; coba lagi."); }
+    finally { submitting.current = false; setSending(false); }
+  };
+  if (!session || !services || !isProgramSlug(config.slug)) return <main className="page-container py-16"><p role="alert">Layanan pengajuan belum tersedia.</p></main>;
+  if (checking) return <main className="page-container py-16"><p role="status">Memeriksa pengajuan…</p></main>;
+  if (saved) return <main className="page-container py-16 text-forest"><h1 className="font-display text-4xl">Pengajuan {config.programName} tersimpan</h1><p className="mt-5">Jawaban Anda sudah tersimpan. Konfirmasi ini merupakan bukti pengajuan, bukan keputusan penerimaan peserta atau persetujuan proyek.</p><dl className="mt-6 break-words"><dt>Nomor pengajuan</dt><dd>{saved.id}</dd><dt className="mt-3">Diterima sistem</dt><dd>{new Date(saved.submitted_at).toLocaleString('id-ID')}</dd></dl><Link to={config.backTo} className={`${outlineButton} mt-8`}>{config.backLabel}</Link></main>;
+  if (requestError && stage === 0) return <main className="page-container py-16"><h1 className="font-display text-3xl">Pengajuan {config.programName}</h1><p role="alert" className="mt-4">{requestError}</p><button type="button" onClick={() => {setChecking(true);setRequestError('');setRetry(x => x + 1);}} className={`${outlineButton} mt-5`}>Coba lagi</button></main>;
 
   return (
-    <main className={`${stage === doneIndex ? "bg-white" : "bg-[#f3faf8]"} pb-12 pt-[33px] tracking-[0.02em] md:pb-20`}>
+    <main className="bg-[#f3faf8] pb-12 pt-[33px] tracking-[0.02em] md:pb-20">
       <PageContainer className="md:max-w-2xl">
         <BackLink to={config.backTo}>{config.backLabel}</BackLink>
         <Eyebrow className="mt-5">{config.eyebrow}</Eyebrow>
@@ -391,11 +400,12 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
         </h1>
         <p className="-mr-2.5 mt-3 text-base font-semibold leading-6 text-forest md:mr-0">{head.description}</p>
 
-        {stage < doneIndex && <Progress labels={labels} current={stage} />}
-        {stage < doneIndex && <p className="mt-8 text-[13px] font-semibold text-forest">Tanda * menunjukkan pertanyaan wajib.</p>}
+        <Progress labels={labels} current={stage} />
+        <p className="mt-8 text-[13px] font-semibold text-forest">Tanda * menunjukkan pertanyaan wajib.</p>
 
         {stage < reviewIndex && (
           <form noValidate onSubmit={(event) => { event.preventDefault(); goNext(); }}>
+            {errors._form && <p role="alert" className="mt-5 text-sm text-berry">{errors._form}</p>}
             {stepAt(stage)!.fields.map((field) => <FieldView key={field.id} field={field} answers={answers} set={set} errors={errors} />)}
             <div className="mt-10 flex flex-col gap-3">
               <button type="submit" className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>
@@ -437,34 +447,22 @@ export default function ProgramForm({ config }: { config: FormConfig }) {
               ))}
             </div>
             <div className="mt-8 flex flex-col gap-3">
+              {requestError && <p role="alert" className="text-sm text-berry">{requestError}</p>}
               <button
                 type="button"
-                aria-disabled={missing}
-                onClick={() => { if (!missing) setStage(doneIndex); }}
+                disabled={missing || sending}
+                aria-disabled={missing || sending}
+                onClick={() => { void submit(); }}
                 className={buttonStyles({ variant: missing ? "outline" : "berry", size: "lg", fullWidth: true, className: `text-[15px] ${missing ? "!cursor-not-allowed !border-transparent !bg-mist !text-forest/70" : ""}` })}
               >
-                {config.review.finishLabel}
+                {sending ? "Mengirim pengajuan…" : "Kirim Pengajuan"}
               </button>
-              <button type="button" onClick={() => setStage(stage - 1)} className={outlineButton}>{prevLabel}{arrow}</button>
+              <button type="button" disabled={sending} onClick={() => setStage(stage - 1)} className={outlineButton}>{prevLabel}{arrow}</button>
             </div>
             <p className="mt-4 text-[13px] font-semibold leading-5 text-forest">{footNote}</p>
           </div>
         )}
 
-        {stage === doneIndex && (
-          <div className="mt-8 md:max-w-md">
-            {config.done.card && (
-              <div className="mb-8 rounded-2xl bg-[#f3faf8] p-5 text-forest">
-                <p className="font-display text-[26px] font-bold leading-[1.15] tracking-normal">{config.done.card.title}</p>
-                <p className="mt-4 text-base font-semibold leading-6">{config.done.card.text}</p>
-              </div>
-            )}
-            <div className="flex flex-col gap-3">
-              <Link to={config.backTo} className={buttonStyles({ variant: "berry", size: "lg", fullWidth: true, className: "text-[15px]" })}>{config.done.backLabel}{arrow}</Link>
-              <Link to={config.done.exploreTo} className={outlineButton}>{config.done.exploreLabel}{arrow}</Link>
-            </div>
-          </div>
-        )}
       </PageContainer>
     </main>
   );

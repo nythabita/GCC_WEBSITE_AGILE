@@ -1,4 +1,4 @@
-import type { FormConfig } from "../../components/form/types";
+import type { FormConfig } from "../../../shared/form-types.ts";
 
 // GrowthConnect business-challenge form, from the "4. PAGE APPLY - GROWTHCONNECT" Figma export (5 steps + finished screen).
 // Draft decisions (not in Figma): WhatsApp variant of the contact field, "terisi" wording on the review list, and the
@@ -137,7 +137,7 @@ export const growthconnectForm: FormConfig = {
   ],
   review: {
     title: "Review Your Submission",
-    description: "Periksa dan ubah jawaban sebelum menyelesaikan simulasi pengajuan tantangan bisnis.",
+    description: "Periksa dan ubah jawaban sebelum mengirim pengajuan tantangan bisnis.",
     finishLabel: "Selesaikan Simulasi",
     sections: [
       {

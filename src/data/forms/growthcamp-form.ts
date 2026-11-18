@@ -1,4 +1,4 @@
-import type { FormConfig } from "../../components/form/types";
+import type { FormConfig } from "../../../shared/form-types.ts";
 
 // GrowthCamp registration form, from the "2. PAGE LEARN" Figma export (5 steps + finished screen).
 // Draft decisions (not in Figma): WhatsApp variant of the contact field and "terisi" wording on the review list.
@@ -102,7 +102,7 @@ export const growthcampForm: FormConfig = {
   ],
   review: {
     title: "Review Your Answers",
-    description: "Periksa dan ubah jawaban sebelum menyelesaikan simulasi. Ringkasan ini mengikuti isian pada langkah sebelumnya.",
+    description: "Periksa dan ubah jawaban sebelum mengirim pengajuan. Ringkasan ini mengikuti isian pada langkah sebelumnya.",
     finishLabel: "Selesaikan Simulasi",
     sections: [
       {

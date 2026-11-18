@@ -6,6 +6,7 @@ import ProgramCard from "./ProgramCard";
 export default function ProgramsSection({ content }: { content: HomepageContent["journey"] }) {
   return (
     <section id="programs" aria-labelledby="programs-title" className="scroll-mt-24 pt-[58px] md:pt-20">
+      <span id="journey" className="scroll-mt-24" aria-hidden="true" />
       <div className="mx-auto w-full max-w-7xl px-6 md:px-8">
         <img src={divider} alt="" aria-hidden="true" className="mx-auto block h-[3px] w-full max-w-[316px] md:max-w-xl" />
         <h2 id="programs-title" className="mx-auto mt-10 max-w-[244px] text-center font-display text-[28px] font-bold italic leading-[1.15] text-black md:max-w-none md:text-5xl lg:text-6xl">

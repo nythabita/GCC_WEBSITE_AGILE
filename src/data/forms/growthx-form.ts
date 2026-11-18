@@ -1,4 +1,4 @@
-import type { FormConfig } from "../../components/form/types";
+import type { FormConfig } from "../../../shared/form-types.ts";
 
 // GrowthX application form, from the "3. PAGE APPLY (GROWTH X)" Figma export (5 steps + finished screen).
 // Draft decisions (not in Figma): WhatsApp variant of the contact field, "terisi" wording on the review list.
@@ -128,7 +128,7 @@ export const growthxForm: FormConfig = {
   ],
   review: {
     title: "Review Your Answers",
-    description: "Periksa dan ubah jawaban sebelum menyelesaikan simulasi formulir awal.",
+    description: "Periksa dan ubah jawaban sebelum mengirim pengajuan awal.",
     finishLabel: "Selesaikan Simulasi",
     sections: [
       {
