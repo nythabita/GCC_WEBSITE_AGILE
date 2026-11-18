@@ -44,15 +44,16 @@ async function completeForm(page: Page, steps = 4) {
 test('a logged-out visitor must sign in before accessing a program form', async ({page})=> {
   await page.goto('/apply/growthx/form');
   await expect(page).toHaveURL(/\/login\?next=/);
-  await expect(page.getByRole('heading',{name:'Sign in to GCC'})).toBeVisible();
-  await expect(page.getByText('Prototype: tap the field to use a demo email.')).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Masuk ke GCC'})).toBeVisible();
 });
-test('minimum login offers Google only and never exposes the deferred OTP form', async ({page})=> {
+test('login offers Google only and shows no prototype or demo content', async ({page})=> {
   await page.goto('/login');
-  await expect(page.getByRole('button',{name:'Continue with Google',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Lanjutkan dengan Google',exact:true})).toBeVisible();
   await expect(page.getByLabel('Email address',{exact:true})).toHaveCount(0);
   await expect(page.getByRole('button',{name:'Create Account',exact:true})).toHaveCount(0);
-  await expect(page.getByText('You’re signed in',{exact:true})).toHaveCount(0);
+  await expect(page.getByText('Anda sudah masuk',{exact:true})).toHaveCount(0);
+  await expect(page.getByText(/prototype|demo/i)).toHaveCount(0);
+  await expect(page.getByRole('main')).toBeVisible();
 });
 test('Google redirect exchanges the code and returns to the protected form', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -73,9 +74,10 @@ test('Google redirect exchanges the code and returns to the protected form', asy
   });
   await page.route('**/rest/v1/program_applications?*', (route) => route.fulfill({ json: [] }));
   await page.goto('/apply/growthx/form');
-  await page.getByRole('button', { name: 'Continue with Google' }).click();
-  await expect(page.getByRole('heading', { name: 'You’re signed in' })).toBeVisible();
-  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  await page.getByRole('button', { name: 'Lanjutkan dengan Google' }).click();
+  await expect(page.getByRole('heading', { name: 'Anda sudah masuk' })).toBeVisible();
+  await expect(page.getByText('tester@example.com')).toBeVisible();
+  await page.getByRole('button', { name: 'Lanjutkan', exact: true }).click();
   await expect(page).toHaveURL(/\/apply\/growthx\/form$/);
   await expect(page.locator('form')).toBeVisible();
 });
@@ -83,7 +85,12 @@ test('Google redirect exchanges the code and returns to the protected form', asy
 test('a callback code without a session explains how to retry', async ({ page }) => {
   await page.goto('/login?code=expired-test-code');
   await expect(page.getByRole('alert')).toContainText('Login Google belum berhasil');
-  await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Lanjutkan dengan Google' })).toBeEnabled();
+});
+test('a denied Google consent shows a retryable error', async ({ page }) => {
+  await page.goto('/login?error=access_denied');
+  await expect(page.getByRole('alert')).toContainText('Login Google belum berhasil');
+  await expect(page.getByRole('button', { name: 'Lanjutkan dengan Google' })).toBeEnabled();
 });
 test('invalid URL shows an actionable field error before advancing to review', async({page})=> {
   await signInFixture(page); await page.route('**/rest/v1/program_applications*',route=>route.fulfill({status:200,contentType:'application/json',body:'[]'}));
