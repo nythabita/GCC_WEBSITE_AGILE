@@ -12,11 +12,6 @@ import CommunitySection from "../components/home/CommunitySection";
 export default function HomePage({ content }: { content: HomepageContent }) {
   return (
     <main className="bg-paper">
-      {content.contentStatus === "example" && (
-        <div className="border-b border-line bg-brand-cream py-3">
-          <p className="page-container text-sm">{content.notice}</p>
-        </div>
-      )}
       <HeroSection content={content.hero} />
       <AboutSection content={content.about} />
       {/* Cream fades into the brand green from the program cards down to the Community band. */}
